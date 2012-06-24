@@ -2,9 +2,12 @@ package com.freedsuniverse.sidecraft;
 
 import java.applet.Applet;
 import java.awt.Color;
+import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -198,5 +201,26 @@ public class Sidecraft extends Applet implements Runnable{
             }
         }
         
+    }
+
+    public static void main(String[] args) {
+        final Frame mainFrame = new Frame();
+        mainFrame.setSize(800, 400);
+        final Sidecraft sideCraft = new Sidecraft();
+        mainFrame.add(sideCraft);
+        mainFrame.setVisible(true);
+        mainFrame.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent event) {
+                mainFrame.dispose();
+            }
+            public void windowClosed(WindowEvent event) {
+                sideCraft.stop();
+                System.exit(0);
+            }
+        });
+        mainFrame.setTitle("Sidecraft");
+        mainFrame.setResizable(false);
+        sideCraft.init();
+        sideCraft.start();
     }
 }
