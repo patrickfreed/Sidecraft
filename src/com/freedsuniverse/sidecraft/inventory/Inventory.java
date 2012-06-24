@@ -12,6 +12,7 @@ public class Inventory {
     public Inventory() {
         contents = new MaterialStack[COLUMNS][ROWS];
         contents[0][0] = new MaterialStack(Material.SILVER_ORE, 5);
+        contents[4][0] = new MaterialStack(Material.TNT, 10);
     }
 
     public void add(MaterialStack stack) {

@@ -6,6 +6,7 @@ import java.awt.Rectangle;
 import com.freedsuniverse.sidecraft.Engine;
 import com.freedsuniverse.sidecraft.Settings;
 import com.freedsuniverse.sidecraft.entity.DropEntity;
+import com.freedsuniverse.sidecraft.entity.TNTPrimed;
 import com.freedsuniverse.sidecraft.material.Material;
 
 public class Block {
@@ -67,6 +68,12 @@ public class Block {
     public void destroy(){
         Material material = this.getType();
         setType(Material.AIR);
+
+        //TODO: Move this to a better place
+        if (material == Material.TNT) {
+            new TNTPrimed(location, 100, 5);
+            return;
+        }
 
         for (int x = 0; x < material.getDropAmount(); x++) {
             new DropEntity(material.getDropType(), new Location(location.getX() + 0.6 * x, location.getY()));

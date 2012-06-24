@@ -145,6 +145,7 @@ public class Sidecraft extends Applet implements Runnable{
             textures.add(ImageIO.read(Sidecraft.class.getResourceAsStream("resources/silver_ore.png")));
             textures.add(ImageIO.read(Sidecraft.class.getResourceAsStream("resources/gold_ore.png")));
             textures.add(ImageIO.read(Sidecraft.class.getResourceAsStream("resources/water.png")));
+            textures.add(ImageIO.read(Sidecraft.class.getResourceAsStream("resources/tnt.png")));
 
             toolbarSelectionTile = ImageIO.read(Sidecraft.class.getResourceAsStream("resources/UIContent/toolbar_selection.png"));
             playerTile = ImageIO.read(Sidecraft.class.getResourceAsStream("resources/steve.png"));
