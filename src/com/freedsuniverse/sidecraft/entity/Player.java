@@ -11,7 +11,6 @@ import com.freedsuniverse.sidecraft.input.Key;
 import com.freedsuniverse.sidecraft.input.Mouse;
 import com.freedsuniverse.sidecraft.inventory.PlayerInventory;
 import com.freedsuniverse.sidecraft.inventory.Toolbar;
-import com.freedsuniverse.sidecraft.material.Material;
 import com.freedsuniverse.sidecraft.material.MaterialStack;
 import com.freedsuniverse.sidecraft.world.Block;
 import com.freedsuniverse.sidecraft.world.Location;

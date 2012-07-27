@@ -43,7 +43,7 @@ public class World {
 
         if (!blocks.containsKey(x + "," + y)) {
             if (coordinates.getY() > -1) {
-                blocks.put(x + "," + y, new Block(Material.WATER));
+                blocks.put(x + "," + y, new Block(Material.AIR));
             }
             else if (coordinates.getY() == -1) {
                 blocks.put(x + "," + y, new Block(Material.GRASS));

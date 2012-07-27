@@ -12,7 +12,8 @@ import com.freedsuniverse.sidecraft.world.Location;
 import com.freedsuniverse.sidecraft.world.World;
 
 public class DropEntity implements Entity{
-
+    final static double REACH_DISTANCE = 1.8;
+    
     private final Material type;
     private Location location;
 
@@ -52,23 +53,36 @@ public class DropEntity implements Entity{
     }
 
     @Override
-    public void update() {
+    public void update() {     
         
+        boolean playerSide = Sidecraft.player.coordinates.getX() > getLocation().getX();
         
-        Block nextBlock = this.getLocation().getWorld().getBlockAt(new Location(location.getX(), location.getY() - 0.5));
-        if (!nextBlock.getType().isSolid()) {
+        Block nextBlockY = this.getLocation().getWorld().getBlockAt(new Location(location.getX(), location.getY() - 0.5));
+        Block nextBlockX;
+        
+        if(playerSide){
+            nextBlockX = this.getLocation().getWorld().getBlockAt(location.modify(0.2, 0));
+        }else{
+            nextBlockX = this.getLocation().getWorld().getBlockAt(location.modify(-0.2, 0));
+        }
+                
+        if (!nextBlockY.getType().isSolid()) {
             location.modifyY(-0.1);
         }
 
-        if (Math.abs(Sidecraft.player.coordinates.getX() - getLocation().getX()) <= 1.5 && Math.abs(Sidecraft.player.coordinates.getY() - getLocation().getY()) <= 1.5) {
-            if (Sidecraft.player.coordinates.getX() > getLocation().getX()) {
-                location.modifyX(0.2);
-            }
-            else {
-                location.modifyX(-0.2);
+        double xDistance = Math.abs(Sidecraft.player.coordinates.getX() - getLocation().getX());
+        double yDistance = Math.abs(Sidecraft.player.coordinates.getY() - getLocation().getY());
+        
+        if(xDistance > 0.3 && yDistance > 0.3){
+            if (xDistance <= REACH_DISTANCE && yDistance <= REACH_DISTANCE && !nextBlockX.getType().isSolid()) {
+                if (playerSide) {
+                    location.modifyX(0.2);
+                }
+                else {
+                    location.modifyX(-0.2);
+                }
             }
         }
-
         if(getBounds().intersects(Sidecraft.player.getBounds())){
             destroy();
         }
