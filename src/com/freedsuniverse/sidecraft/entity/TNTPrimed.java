@@ -5,13 +5,10 @@ import java.awt.Rectangle;
 
 import com.freedsuniverse.sidecraft.Engine;
 import com.freedsuniverse.sidecraft.Settings;
-import com.freedsuniverse.sidecraft.Sidecraft;
 import com.freedsuniverse.sidecraft.material.Material;
-import com.freedsuniverse.sidecraft.material.MaterialStack;
 import com.freedsuniverse.sidecraft.world.Block;
 import com.freedsuniverse.sidecraft.world.Explosion;
 import com.freedsuniverse.sidecraft.world.Location;
-import com.freedsuniverse.sidecraft.world.World;
 
 public class TNTPrimed implements Entity {
 
