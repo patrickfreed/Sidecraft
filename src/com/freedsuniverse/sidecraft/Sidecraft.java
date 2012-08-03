@@ -25,13 +25,7 @@ import com.freedsuniverse.sidecraft.world.World;
 public class Sidecraft extends Applet implements Runnable{
     private static final long serialVersionUID = 1L;
     
-    public static int width, height;
-    
-    public final int GRASS = 0;
-    public final int DIRT = 1;
-    public final int STONE = 2;
-    public final int IRON_ORE = 3;
-    public final int AIR = 4;
+    public static int width, height;   
 
     public final String newLine = System.getProperty("line.separator");
     
@@ -101,12 +95,7 @@ public class Sidecraft extends Applet implements Runnable{
             }
         }else{
             if (Key.F5.isDown()) {
-                if (Settings.DEBUG) {
-                    Settings.DEBUG = false;
-                }
-                else {
-                    Settings.DEBUG = true;
-                }
+                Settings.DEBUG = !Settings.DEBUG;
             }
             player.getWorld().update();
             player.update();     
@@ -165,22 +154,18 @@ public class Sidecraft extends Applet implements Runnable{
     }
     
     public void update(Graphics g){
-     // Initialisierung des DoubleBuffers
         if (dbImage == null)
         {
             dbImage = createImage (this.getSize().width, this.getSize().height);
             dbg = dbImage.getGraphics ();
         }
 
-        // Bildschirm im Hintergrund löschen
         dbg.setColor (getBackground ());
         dbg.fillRect (0, 0, this.getSize().width, this.getSize().height);
 
-        // Auf gelöschten Hintergrund Vordergrund zeichnen
         dbg.setColor (getForeground());
         paint (dbg);
         
-        // Nun fertig gezeichnetes Bild Offscreen auf dem richtigen Bildschirm anzeigen
         g.drawImage (dbImage, 0, 0, this);
     }
     
@@ -196,7 +181,6 @@ public class Sidecraft extends Applet implements Runnable{
             try {
                 Thread.sleep(20);
             } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }
