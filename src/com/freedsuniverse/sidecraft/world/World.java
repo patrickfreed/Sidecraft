@@ -13,7 +13,8 @@ public class World {
     private HashMap<String, Block> blocks;
 
     private LinkedList<Entity> entities;
-
+    private LinkedList<String> actives;
+    
     private String name;
 
     private int xLength;
@@ -25,6 +26,7 @@ public class World {
         this.xLength = Sidecraft.width / Settings.BLOCK_SIZE;
         this.yLength = Sidecraft.height / Settings.BLOCK_SIZE;
 
+        actives = new LinkedList<String>();
         entities = new LinkedList<Entity>();
         draw();
     }
@@ -37,6 +39,19 @@ public class World {
         return blocks;
     }
 
+    public void setBlockAt(Location loc, Block b){
+        int x = (int)Math.floor(loc.getX());
+        int y = (int)Math.ceil(loc.getY());
+
+        
+        blocks.put(x + "," + y, b);
+        blocks.get(x + "," + y).setLocation(loc);
+        
+        if(b instanceof ActiveBlock){
+            actives.add(x + "," + y);
+        }
+    }
+    
     public Block getBlockAt(Location coordinates) {
         int x = (int)Math.floor(coordinates.getX());
         int y = (int)Math.ceil(coordinates.getY());
@@ -69,6 +84,15 @@ public class World {
 
     public void update() {
       updateEntities();
+      updateBlocks();
+    }
+
+    private void updateBlocks() {
+        for(int x = 0; x < actives.size(); x++){
+            ActiveBlock b = (ActiveBlock)blocks.get(actives.get(x));
+            b.update();
+        }
+        
     }
 
     public void generateWorld(){

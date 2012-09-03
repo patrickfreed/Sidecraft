@@ -4,8 +4,8 @@ import java.awt.Color;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
-import com.freedsuniverse.sidecraft.Engine;
 import com.freedsuniverse.sidecraft.Sidecraft;
+import com.freedsuniverse.sidecraft.engine.Engine;
 import com.freedsuniverse.sidecraft.material.MaterialStack;
 
 public class Toolbar {

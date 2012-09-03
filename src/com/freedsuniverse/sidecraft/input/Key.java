@@ -4,16 +4,27 @@ public class Key {
     
     public static Key W = new Key(), A = new Key(), S = new Key() ,D = new Key(), B = new Key(), I = new Key(), F5 = new Key(), SPACE = new Key();
     
-    boolean down;
+    boolean down, old, current;
     
     public Key(){
         down = false;
+        old = false;
+        current = false;
     }
     
     public void toggle(boolean pressed) {
         if (pressed != down) {
             down = pressed;
         }
+    }
+    
+    public void update(){
+        old = current;
+        current = isDown();
+    }
+    
+    public boolean toggled(){
+        return old == false && current == true;
     }
     
     public boolean isDown(){

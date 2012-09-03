@@ -3,8 +3,8 @@ package com.freedsuniverse.sidecraft.world;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 
-import com.freedsuniverse.sidecraft.Engine;
 import com.freedsuniverse.sidecraft.Settings;
+import com.freedsuniverse.sidecraft.engine.Engine;
 import com.freedsuniverse.sidecraft.entity.DropEntity;
 import com.freedsuniverse.sidecraft.entity.TNTPrimed;
 import com.freedsuniverse.sidecraft.material.Material;

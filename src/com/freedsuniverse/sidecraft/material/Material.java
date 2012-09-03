@@ -16,7 +16,8 @@ public enum Material{
     SILVER_ORE(8, 60),
     GOLD_ORE(9, 45),
     WATER(0, 0, 0, 0, 0, false),
-    TNT(0);
+    TNT(0),
+    WORKBENCH(12, 45);
     
     private int id, stack, damage, durability, dropamount, dropType;
     private BufferedImage img;

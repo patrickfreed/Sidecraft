@@ -5,16 +5,16 @@ import com.freedsuniverse.sidecraft.material.MaterialStack;
 
 public class Inventory {
     private MaterialStack[][] contents;
-
+    
     final int COLUMNS = 5;
-    final int ROWS = 5;
-
+    final int ROWS = 4;
+    
     public Inventory() {
         contents = new MaterialStack[COLUMNS][ROWS];
-        contents[0][0] = new MaterialStack(Material.SILVER_ORE, 5);
+        contents[0][0] = new MaterialStack(Material.WORKBENCH, 5);
         contents[4][0] = new MaterialStack(Material.TNT, 10);
     }
-
+    
     public void add(MaterialStack stack) {
         for(int y = 0; y < contents[0].length; y++){
             for (int x = 0; x < contents.length; x++) {

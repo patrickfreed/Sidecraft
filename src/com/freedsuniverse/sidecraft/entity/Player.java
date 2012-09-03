@@ -4,19 +4,22 @@ import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 
-import com.freedsuniverse.sidecraft.Engine;
 import com.freedsuniverse.sidecraft.Settings;
 import com.freedsuniverse.sidecraft.Sidecraft;
+import com.freedsuniverse.sidecraft.engine.Engine;
 import com.freedsuniverse.sidecraft.input.Key;
 import com.freedsuniverse.sidecraft.input.Mouse;
 import com.freedsuniverse.sidecraft.inventory.PlayerInventory;
 import com.freedsuniverse.sidecraft.inventory.Toolbar;
+import com.freedsuniverse.sidecraft.material.Material;
 import com.freedsuniverse.sidecraft.material.MaterialStack;
+import com.freedsuniverse.sidecraft.world.ActiveBlock;
 import com.freedsuniverse.sidecraft.world.Block;
 import com.freedsuniverse.sidecraft.world.Location;
 import com.freedsuniverse.sidecraft.world.World;
+import com.freedsuniverse.sidecraft.world.active.Workbench;
 
-public class Player {
+public class Player implements Entity {
     private final double RIGHT_ARM_LENGTH = 3;
 
     public Rectangle ScreenPosition;
@@ -34,10 +37,10 @@ public class Player {
     private double originalY;
 
     private MovementState moveState;
-    private ActionState action;
+    private ActionState action, oldAction;
 
     final double JUMP_HEIGHT = 1.3;
-    final int LEFT = -1, UP = 1, RIGHT = 1, DOWN = -1, STABLE = 0, ARM_LENGTH = 4;
+    final int LEFT = -1, UP = 1, RIGHT = 1, DOWN = -1, STABLE = 0, ARM_LENGTH = 4, IDLE = 0, BUSY = 1;
 
     private int MOVEMENT_SPEED;
     float startX, startY, currentX, currentY, oldX, oldY;
@@ -60,7 +63,7 @@ public class Player {
 
     enum ActionState {
         IDLE,
-        INVENTORY
+        BUSY
     }
 
     public Player() {
@@ -92,8 +95,10 @@ public class Player {
 
         moveState = MovementState.WALKING;
         action = ActionState.IDLE;
+        oldAction = action;
     }
 
+    @Override
     public void update() {
         oldWheelValue = currentWheelValue;
         currentWheelValue = Mouse.getScrollWheelValue();
@@ -109,21 +114,26 @@ public class Player {
         updateInteraction();
         updateToolbar();
         updatePosition();
+        
+        if(oldAction != action){
+            oldAction = action;
+        }
     }
 
     private void updateToolbar() {
-        if (currentWheelValue > oldWheelValue || (bState && !oldBState)) {
+        if (currentWheelValue < oldWheelValue || (bState && !oldBState)) {
             getToolbar().setCurrentIndex(1);
         }
-        else if (currentWheelValue < oldWheelValue) {
+        else if (currentWheelValue > oldWheelValue) {
             getToolbar().setCurrentIndex(-1);
         }
     }
 
     private void updateInteraction() {
-        if (action != ActionState.INVENTORY) {
-            if(iState && !oldIState){
-                action = ActionState.INVENTORY;
+        if (action != ActionState.BUSY) {
+            if(iState && !oldIState && oldAction != ActionState.BUSY){
+                setAction(BUSY);
+                inventory.open();
             }
             else if (Mouse.isDown(MouseEvent.BUTTON1)) {
                 Location mouseCoords = Location.valueOf(Mouse.getX(), Mouse.getY());
@@ -138,22 +148,31 @@ public class Player {
                     getWorld().getBlockAt(mouseCoords).damage(5);
                 }
             }
-            else if (Mouse.isDown(MouseEvent.BUTTON3)) {
+            else if (Mouse.clicked(MouseEvent.BUTTON3)) {
                 Location mouseCoords = Location.valueOf(Mouse.getX(), Mouse.getY());
                 Block block = getWorld().getBlockAt(mouseCoords);
 
                 if (canPlaceBlock(block)) {
-                    block.setType(getToolbar().getSelectedObj().getType());
+                    if(getToolbar().getSelectedObj().getType() == Material.WORKBENCH){                
+                        getWorld().setBlockAt(block.getLocation(), new Workbench());
+                    }else{       
+                        block.setType(getToolbar().getSelectedObj().getType());
+                    }
                     getToolbar().getSelectedObj().modifyAmount(-1);
 
                     if (getToolbar().getSelectedObj().getAmount() <= 0) {
                         getInventory().setAt(getToolbar().getCurrentIndex(), 0, null);
                     }
+                }else{   
+                    if(block instanceof ActiveBlock){
+                        ActiveBlock activeBlock = (ActiveBlock) block;
+                        activeBlock.interact(this);
+                    }
                 }
             }
         }else{
             if (iState && !oldIState) {
-                action = ActionState.IDLE;
+                setAction(IDLE);
                 getInventory().close();
             }
             else {
@@ -167,47 +186,53 @@ public class Player {
      */
 
     private void updateMovement() {
-        if (Key.A.isDown() || Key.S.isDown()) {
-            xSpeed = MOVEMENT_SPEED;
-            xDirection = LEFT;
-        }
-        else if (Key.W.isDown() || Key.D.isDown()) {
-            xSpeed = MOVEMENT_SPEED;
-            xDirection = RIGHT;
-        }
-        else {
-            
-            xDirection = STABLE;
-            xSpeed = 0;
-        }
-
-        int left = ScreenPosition.x;
-        int right = (int)ScreenPosition.getMaxX();
-
-        Location leftFoot = Location.valueOf(left + Settings.BLOCK_SIZE/8, ScreenPosition.getMaxY());
-        Location rightFoot = Location.valueOf(right - Settings.BLOCK_SIZE / 8, ScreenPosition.getMaxY());
-        
-        //Location rightEar = Location.valueOf(right - Settings.BLOCK_SIZE / 8, ScreenPosition.getTop());
-        //Location leftEar = Location.valueOf(left + Settings.BLOCK_SIZE / 8, ScreenPosition.getTop());
         Location above = Location.valueOf(ScreenPosition.getCenterX(), ScreenPosition.y + Settings.BLOCK_SIZE / 8);
+        
+        if(action != ActionState.BUSY){
+            if (Key.A.isDown() || Key.S.isDown()) {
+                xSpeed = MOVEMENT_SPEED;
+                xDirection = LEFT;
+            }
+            else if (Key.W.isDown() || Key.D.isDown()) {
+                xSpeed = MOVEMENT_SPEED;
+                xDirection = RIGHT;
+            }
+            else {  
+                xDirection = STABLE;
+                xSpeed = 0;
+            }
 
-        if (moveState == MovementState.WALKING) {
-            if (Key.SPACE.isDown()) {
-                boolean canJump = (getWorld().getBlockAt(leftFoot).getType().isSolid() || getWorld().getBlockAt(rightFoot).getType().isSolid()) && !getWorld().getBlockAt(above).getType().isSolid();
-                if (canJump) {
-                    ySpeed = 4;
-                    yDirection = UP;
-                    moveState = MovementState.JUMPING;
-                    originalY = coordinates.getY();
+            int left = ScreenPosition.x;
+            int right = (int)ScreenPosition.getMaxX();
+
+            Location leftFoot = Location.valueOf(left + Settings.BLOCK_SIZE / 8, ScreenPosition.getMaxY());
+            Location rightFoot = Location.valueOf(right - Settings.BLOCK_SIZE / 8, ScreenPosition.getMaxY());
+
+            //Location rightEar = Location.valueOf(right - Settings.BLOCK_SIZE / 8, ScreenPosition.getTop());
+            //Location leftEar = Location.valueOf(left + Settings.BLOCK_SIZE / 8, ScreenPosition.getTop());   
+
+            if (moveState == MovementState.WALKING) {
+                if (Key.SPACE.isDown()) {
+                    boolean canJump = (getWorld().getBlockAt(leftFoot).getType().isSolid() || getWorld().getBlockAt(rightFoot).getType().isSolid()) && !getWorld().getBlockAt(above).getType().isSolid();
+                    if (canJump) {
+                        ySpeed = 4;
+                        yDirection = UP;
+                        moveState = MovementState.JUMPING;
+                        originalY = coordinates.getY();
+                    }
                 }
-            }
-            else {
-                ySpeed = STABLE;
-                yDirection = STABLE;
-            }
+                else {
+                    ySpeed = STABLE;
+                    yDirection = STABLE;
+                }
 
+            }
+        }else{
+            ySpeed = STABLE;
+            yDirection = STABLE;
+            xDirection = STABLE;
+            xSpeed = STABLE;
         }
-
         if (moveState == MovementState.JUMPING && ((coordinates.getY() - this.originalY >= JUMP_HEIGHT) || getWorld().getBlockAt(above).getType().isSolid())) {
             moveState = MovementState.FALLING;
             ySpeed = 4;
@@ -273,6 +298,16 @@ public class Player {
         coordinates.modifyY((currentY - oldY) / 32);
     }
 
+    public void setAction(int i){
+        oldAction = action;
+        
+        if(i == IDLE){
+            action = ActionState.IDLE;
+        }else if(i == BUSY){
+            action = ActionState.BUSY;
+        }
+    }
+    
     public void draw() {
         Engine.render(coordinates, Settings.BLOCK_SIZE, Settings.BLOCK_SIZE, texture);
         
@@ -284,10 +319,10 @@ public class Player {
 
         Location mouseCoords = Location.valueOf(Mouse.getX(), Mouse.getY());
 
-        if (action == ActionState.INVENTORY)
-            getInventory().draw();
-        else {
-            toolbar.Draw();
+        toolbar.Draw();
+        getInventory().draw();
+        
+        if(action != ActionState.BUSY){
             if (Math.abs(mouseCoords.getX() - coordinates.getX()) <= 4 && Math.abs(mouseCoords.getY() - coordinates.getY()) <= 4)
                 Engine.render(getWorld().getBlockAt(mouseCoords).getLocation(), Settings.BLOCK_SIZE, Settings.BLOCK_SIZE, Sidecraft.selectionTile);
         }

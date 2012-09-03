@@ -6,8 +6,8 @@ import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.util.HashMap;
 
-import com.freedsuniverse.sidecraft.Engine;
 import com.freedsuniverse.sidecraft.Sidecraft;
+import com.freedsuniverse.sidecraft.engine.Engine;
 import com.freedsuniverse.sidecraft.input.Mouse;
 
 

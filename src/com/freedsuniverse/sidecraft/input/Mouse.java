@@ -1,10 +1,15 @@
 package com.freedsuniverse.sidecraft.input;
 
+import java.awt.Point;
 import java.awt.event.MouseEvent;
 
 public class Mouse {
-    private static boolean m1 = false, m2 = false, m3 = false;
+    private static boolean m1 = false, oldm1 = false, currentm1 = false, m2 = false, oldm2 = false, currentm2 = false, m3 = false, oldm3 = false, currentm3 = false;
     private static int x = 0,y = 0,w = 0;
+    
+    public static Point getPoint(){
+        return new Point(x, y);
+    }
     
     public static void modifyScrollWheelValue(int a){
         Mouse.w += a;
@@ -38,6 +43,24 @@ public class Mouse {
         }else if(button == MouseEvent.BUTTON3 && toggleType != m3){
             m3 = !m3;
         }
+    }
+    
+    public static boolean clicked(int button){
+        if(button == MouseEvent.BUTTON1) return m1 && !oldm1;
+        else if(button == MouseEvent.BUTTON2) return m2 && !oldm2;
+        else if(button == MouseEvent.BUTTON3) return m3 && !oldm3;
+        else return false;
+    }
+    
+    public static void update(){
+        oldm1 = currentm1;
+        currentm1 = m1;
+        
+        oldm2 = currentm2;
+        currentm2 = m2;
+        
+        oldm3 = currentm3;
+        currentm3 = m3;
     }
     
     public static boolean isDown(int button){

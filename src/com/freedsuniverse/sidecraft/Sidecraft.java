@@ -5,18 +5,22 @@ import java.awt.Color;
 import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Image;
-import java.awt.image.BufferedImage;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 
 import javax.imageio.ImageIO;
 
+import com.freedsuniverse.sidecraft.engine.Engine;
 import com.freedsuniverse.sidecraft.entity.Player;
 import com.freedsuniverse.sidecraft.input.InputListener;
 import com.freedsuniverse.sidecraft.input.Key;
+import com.freedsuniverse.sidecraft.input.Mouse;
+import com.freedsuniverse.sidecraft.material.CraftingRecipe;
+import com.freedsuniverse.sidecraft.material.Material;
 import com.freedsuniverse.sidecraft.screen.Menu;
 import com.freedsuniverse.sidecraft.screen.Screen;
 import com.freedsuniverse.sidecraft.world.Location;
@@ -34,7 +38,7 @@ public class Sidecraft extends Applet implements Runnable{
     public static boolean isRunning = false, isScreen = true;
 
     public static Image stoneTile2;
-    public static BufferedImage selectionTile, toolbarTile, inventoryTile, playerTile, toolbarSelectionTile;
+    public static BufferedImage selectionTile, toolbarTile, inventoryTile, playerTile, toolbarSelectionTile, workbenchTile;
 
     public static LinkedList<BufferedImage> textures;
     
@@ -59,7 +63,7 @@ public class Sidecraft extends Applet implements Runnable{
         this.addKeyListener(i);
         this.addMouseListener(i);
         this.addMouseMotionListener(i);
-        this.addMouseWheelListener(i);
+        this.addMouseWheelListener(i);     
     }
     
     public void start() {
@@ -68,6 +72,7 @@ public class Sidecraft extends Applet implements Runnable{
                       
         Thread th = new Thread(this);
         loadContent();
+        CraftingRecipe.recipes.add(new CraftingRecipe(new int[]{2, 2, -1, -1, -1, -1, -1, -1, -1}, Material.IRON_ORE, 16));
         th.start();
     }
 
@@ -83,10 +88,9 @@ public class Sidecraft extends Applet implements Runnable{
         update();
     }
 
-    public void UnloadContent() {
-    }
-
     public void update() {
+        updateKeys();
+        Mouse.update();
         if(isScreen){
             for (Screen s:screens){
                 if(s.isVisible()){
@@ -102,10 +106,20 @@ public class Sidecraft extends Applet implements Runnable{
         }
     }
 
+    private void updateKeys(){
+        Key.W.update();
+        Key.A.update();
+        Key.S.update();
+        Key.D.update();
+        Key.B.update();
+        Key.F5.update();
+        Key.SPACE.update();
+        Key.I.update();
+    }
     
     public void paint(Graphics g) {     
         Engine.graphics = g;
-        
+            
         if(isScreen){
             for (Screen s:screens){
                 if(s.isVisible()){
@@ -115,7 +129,7 @@ public class Sidecraft extends Applet implements Runnable{
         }else{
             player.getWorld().draw();
             player.draw();
-
+            Engine.drawQueue();
             if (Settings.DEBUG) {
                 //Screen.renderString(Sidecraft.player.getLocation().toString() + newLine + mouseCoords.toString() + newLine + "Mouse position" + mouseCoords.toVector2().ToString(), new Vector2(10, 10), Color.Black);
                 Engine.renderString(player.getLocation().toString(), 90, 110, Color.blue);
@@ -138,12 +152,14 @@ public class Sidecraft extends Applet implements Runnable{
             textures.add(ImageIO.read(Sidecraft.class.getResourceAsStream("resources/gold_ore.png")));
             textures.add(ImageIO.read(Sidecraft.class.getResourceAsStream("resources/water.png")));
             textures.add(ImageIO.read(Sidecraft.class.getResourceAsStream("resources/tnt.png")));
+            textures.add(ImageIO.read(Sidecraft.class.getResourceAsStream("resources/workbench.png")));
 
             toolbarSelectionTile = ImageIO.read(Sidecraft.class.getResourceAsStream("resources/UIContent/toolbar_selection.png"));
             playerTile = ImageIO.read(Sidecraft.class.getResourceAsStream("resources/steve.png"));
             toolbarTile = ImageIO.read(Sidecraft.class.getResourceAsStream("resources/UIContent/toolbar.png"));
             selectionTile = ImageIO.read(Sidecraft.class.getResourceAsStream("resources/Mouse/selection.png"));
             inventoryTile = ImageIO.read(Sidecraft.class.getResourceAsStream("resources/inventory.png"));
+            workbenchTile = ImageIO.read(Sidecraft.class.getResourceAsStream("resources/workbench_interior.png"));
         } catch (IOException e) {
             e.printStackTrace();
         } 
@@ -170,10 +186,6 @@ public class Sidecraft extends Applet implements Runnable{
     }
     
     public void run() {  
-        
-        
-        System.out.println("running");
-        
         while(isRunning){
             update();
             repaint();
@@ -183,8 +195,7 @@ public class Sidecraft extends Applet implements Runnable{
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-        }
-        
+        }  
     }
 
     public static void main(String[] args) {
