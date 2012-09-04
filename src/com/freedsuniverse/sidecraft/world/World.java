@@ -19,6 +19,9 @@ public class World {
 
     private int xLength;
     private int yLength;
+    
+    // codename_B's noise gen
+    FlatNoiseGen gen = new FlatNoiseGen();
 
     public World(String n) {
         this.name = n;
@@ -55,27 +58,9 @@ public class World {
     public Block getBlockAt(Location coordinates) {
         int x = (int)Math.floor(coordinates.getX());
         int y = (int)Math.ceil(coordinates.getY());
-
+        
         if (!blocks.containsKey(x + "," + y)) {
-            if (coordinates.getY() > -1) {
-                blocks.put(x + "," + y, new Block(Material.AIR));
-            }
-            else if (coordinates.getY() == -1) {
-                blocks.put(x + "," + y, new Block(Material.GRASS));
-            }
-            else if (coordinates.getY() == -2) {
-                Random rnd = new Random();
-
-                if (rnd.nextInt(2) == 0) {
-                    blocks.put(x + "," + y, new Block(Material.DIRT));
-                }
-                else {
-                    blocks.put(x + "," + y, new Block(Material.STONE));
-                }
-            }
-            else if (coordinates.getY() < -2) {
-                blocks.put(x + "," + y, new Block(Material.STONE));
-            }
+            blocks.put(x + "," + y, new Block(gen.getBlock(x, y)));
             blocks.get(x + "," + y).setLocation(coordinates);
         }
 
