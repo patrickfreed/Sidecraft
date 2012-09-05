@@ -45,6 +45,11 @@ public class InputListener implements KeyListener, MouseListener, MouseMotionLis
         else if(e.getKeyCode() == KeyEvent.VK_F5)Key.F5.toggle(toggleType);
         else if(e.getKeyCode() == KeyEvent.VK_I) Key.I.toggle(toggleType);
         else if(e.getKeyCode() == KeyEvent.VK_SPACE) Key.SPACE.toggle(toggleType);
+        else if(e.getKeyCode() == KeyEvent.VK_1) Key.ONE.toggle(toggleType);
+        else if(e.getKeyCode() == KeyEvent.VK_2) Key.TWO.toggle(toggleType);
+        else if(e.getKeyCode() == KeyEvent.VK_3) Key.THREE.toggle(toggleType);
+        else if(e.getKeyCode() == KeyEvent.VK_4) Key.FOUR.toggle(toggleType);
+        else if(e.getKeyCode() == KeyEvent.VK_5) Key.FIVE.toggle(toggleType);
     }
     
     @Override

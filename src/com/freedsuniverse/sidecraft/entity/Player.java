@@ -122,10 +122,16 @@ public class Player implements Entity {
 
     private void updateToolbar() {
         if (currentWheelValue < oldWheelValue || (bState && !oldBState)) {
-            getToolbar().setCurrentIndex(1);
+            getToolbar().addToCurrentIndex(1);
         }
         else if (currentWheelValue > oldWheelValue) {
-            getToolbar().setCurrentIndex(-1);
+            getToolbar().addToCurrentIndex(-1);
+        } else {
+            if (Key.ONE.isDown()) getToolbar().setCurrentIndex(0);
+            else if (Key.TWO.isDown()) getToolbar().setCurrentIndex(1);
+            else if (Key.THREE.isDown()) getToolbar().setCurrentIndex(2);
+            else if (Key.FOUR.isDown()) getToolbar().setCurrentIndex(3);
+            else if (Key.FIVE.isDown()) getToolbar().setCurrentIndex(4);
         }
     }
 

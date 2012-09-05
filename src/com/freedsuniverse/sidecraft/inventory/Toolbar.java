@@ -43,7 +43,7 @@ public class Toolbar {
         return currentIndex;
     }
 
-    public void setCurrentIndex(int index) {
+    public void addToCurrentIndex(int index) {
         if (index == 1) {
             if (currentIndex <= 3) {
                 currentIndex += 1;
@@ -59,6 +59,10 @@ public class Toolbar {
                 currentIndex = 4;
             }
         }
+    }
+
+    public void setCurrentIndex(int newIndex) {
+        currentIndex = newIndex % 5;
     }
 
     public void Draw() {

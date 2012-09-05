@@ -60,11 +60,28 @@ public class World {
         int y = (int)Math.ceil(coordinates.getY());
         
         if (!blocks.containsKey(x + "," + y)) {
-            blocks.put(x + "," + y, new Block(gen.getBlock(x, y)));
+            blocks.put(x + "," + y, new Block(gen.getBlock(this, x, y)));
             blocks.get(x + "," + y).setLocation(coordinates);
         }
 
         return blocks.get(x + "," + y);
+    }
+
+    protected int oreAmountAround(int x, int y) {
+	int oreCount = 0;
+        Block left = blocks.get((x - 1) + "," + y);
+        if (left != null && isOre(left.getType())) oreCount++;
+        Block right = blocks.get((x + 1) + "," + y);
+        if (right != null && isOre(right.getType())) oreCount++;;
+        Block top = blocks.get(x + "," + (y + 1));
+        if (top != null && isOre(top.getType())) oreCount++;
+        Block bottom = blocks.get(x + "," + (y - 1));
+        if (bottom != null && isOre(bottom.getType())) oreCount++;
+        return oreCount;
+    }
+
+    private boolean isOre(Material mat) {
+        return mat == Material.COAL_ORE || mat == Material.SILVER_ORE || mat == Material.GOLD_ORE;
     }
 
     public void update() {
