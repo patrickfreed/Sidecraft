@@ -20,12 +20,26 @@ public class FlatNoiseGen {
 	public int surface = 10;
 	public int lower = -10;
 	public Random rand = new Random(seed);
+	/** Random used for population */
+	public Random pRnd = new Random();
 
 	public double noise(int x, int y) {
 		return Noise.GradientCoherentNoise3D(x/(scale*2), y/scale, 0, seed, NoiseQuality.BEST);
 	}
 
-	public Material getBlock(int x, int y) {
+	public Material getBlock(World world, int x, int y) {
+		Material block = getRawBlock(x, y);
+		// population: ores
+		if (block == STONE) {
+			int oreAround = world.oreAmountAround(x, y);
+			if (oreAround == 4 || (oreAround > 0 && pRnd.nextInt(4) < oreAround) || pRnd.nextInt(64) == 0) {
+				block = getRandomOreMaterial();
+			}
+		}
+		return block;
+	}
+
+	public Material getRawBlock(int x, int y) {
 		if(y > 128) {
 			System.err.println("Height exceeded!");
 			return AIR;
@@ -41,7 +55,7 @@ public class FlatNoiseGen {
 		}
 
 		if(d >= threshold) {
-			Material id = getBlock(x, y+1);
+			Material id = getRawBlock(x, y+1);
 			if(id == AIR) {
 				return GRASS;
 			} 
@@ -51,6 +65,25 @@ public class FlatNoiseGen {
 			return STONE;
 		}
 		return AIR;
+	}
+
+
+
+
+	private Material getRandomOreMaterial() {
+		int oreType = pRnd.nextInt(5);
+		switch (oreType) {
+			case 0:
+			case 1:
+			case 2:
+				return Material.COAL_ORE;
+			case 3:
+				return Material.SILVER_ORE;
+			case 4:
+				return Material.GOLD_ORE;
+			default:
+				return Material.COAL_ORE; //should never get here
+		}
 	}
 
 }

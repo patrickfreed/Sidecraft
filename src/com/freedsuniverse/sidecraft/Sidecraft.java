@@ -115,6 +115,11 @@ public class Sidecraft extends Applet implements Runnable{
         Key.F5.update();
         Key.SPACE.update();
         Key.I.update();
+        Key.ONE.update();
+        Key.TWO.update();
+        Key.THREE.update();
+        Key.FOUR.update();
+        Key.FIVE.update();
     }
     
     public void paint(Graphics g) {     
