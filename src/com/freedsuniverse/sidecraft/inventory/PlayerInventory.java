@@ -11,7 +11,6 @@ import com.freedsuniverse.sidecraft.engine.RenderQueueItem;
 import com.freedsuniverse.sidecraft.entity.DropEntity;
 import com.freedsuniverse.sidecraft.input.Mouse;
 import com.freedsuniverse.sidecraft.material.CraftingRecipe;
-import com.freedsuniverse.sidecraft.material.Material;
 import com.freedsuniverse.sidecraft.material.MaterialStack;
 
 public class PlayerInventory extends Inventory{
@@ -100,7 +99,7 @@ public class PlayerInventory extends Inventory{
         x = Sidecraft.width / 2 - Sidecraft.inventoryTile.getWidth() / 2;
         y = Sidecraft.height / 2 - Sidecraft.inventoryTile.getHeight() / 2;
         craftingArea = new Slot[2][2];
-        outputSlot = new Slot(null, new Rectangle(x + Sidecraft.inventoryTile.getWidth() - 10, y + 20, 30, 30));
+        outputSlot = new Slot(null, new Rectangle(x + Sidecraft.inventoryTile.getWidth() - 48, y + 54, 30, 30));
     }
     
     public void update(){
@@ -136,9 +135,7 @@ public class PlayerInventory extends Inventory{
             System.out.print(x + " ");         
         }
         
-        if(outcome != null){
-            this.outputSlot.setContent(outcome);
-        }
+        outputSlot.setContent(outcome);
     }
 
     private int[] getRecipeData(){
@@ -195,8 +192,7 @@ public class PlayerInventory extends Inventory{
             for (int x = 0; x < this.getContents().length; x++) {
                 Rectangle box = new Rectangle(this.x + X_DIFF + (38 * x), this.y + Y_DIFF - (38 * y) + 1, 30, 30);             
                 if (getContents()[x][y] != null) {                   
-                    Engine.render(box, getContents()[x][y].getType().getImage());
-                    Engine.renderString(String.valueOf(getAt(x, y).getAmount()), (int)box.getCenterX() + 5, (int)box.getCenterY() - 1, Color.WHITE);
+                    getContents()[x][y].draw(box);                 
                 }
                 if(box.contains(Mouse.getPoint())){
                     if(box.contains(Mouse.getPoint())){
@@ -224,9 +220,7 @@ public class PlayerInventory extends Inventory{
         
         if(outputSlot.getContent() != null){
             outputSlot.getContent().draw(outputSlot.getBounds(), true);
-        }
-        
-        Engine.addQueueItem(new RenderQueueItem(Material.DIRT.getImage(), outputSlot.getBounds()));
+        }       
         
         if (onMouse != null) {
             onMouse.draw(Mouse.getPoint(), true);
@@ -246,10 +240,18 @@ public class PlayerInventory extends Inventory{
     public void close() {
         if (onMouse != null) {
             for (int x = 0; x < onMouse.getAmount(); x++) {
-                new DropEntity(onMouse.getType(), Sidecraft.player.getLocation());
+                new DropEntity(onMouse.getType(), Sidecraft.player.getLocation()).spawn();
             }
             onMouse = null;
         }
+        
+        for (int y = 0; y < this.craftingArea[0].length; y++) {
+            for (int x = 0; x < this.craftingArea.length; x++) {
+                if(craftingArea[x][y].getContent() != null)
+                    new DropEntity(craftingArea[x][y].getContent().getType(), Sidecraft.player.getLocation()).spawn();
+            }
+        }
+        outputSlot.setContent(null);
         isOpen = false;
     }
 
@@ -265,5 +267,6 @@ public class PlayerInventory extends Inventory{
                 }
             }
         }
+        outputSlot.setContent(null);
     }
 }

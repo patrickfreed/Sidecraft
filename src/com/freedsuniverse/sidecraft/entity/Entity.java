@@ -11,6 +11,8 @@ public interface Entity {
 
     void destroy();
 
+    void setLocation(Location l);
+    
     Location getLocation();
 
     Rectangle getBounds();

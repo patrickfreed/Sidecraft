@@ -50,6 +50,7 @@ public class InputListener implements KeyListener, MouseListener, MouseMotionLis
         else if(e.getKeyCode() == KeyEvent.VK_3) Key.THREE.toggle(toggleType);
         else if(e.getKeyCode() == KeyEvent.VK_4) Key.FOUR.toggle(toggleType);
         else if(e.getKeyCode() == KeyEvent.VK_5) Key.FIVE.toggle(toggleType);
+        else if(e.getKeyCode() == KeyEvent.VK_ESCAPE) Key.ESCAPE.toggle(toggleType);
     }
     
     @Override

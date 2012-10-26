@@ -1,6 +1,5 @@
 package com.freedsuniverse.sidecraft.world.active;
 
-import java.awt.Color;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
@@ -17,9 +16,9 @@ import com.freedsuniverse.sidecraft.inventory.Slot;
 import com.freedsuniverse.sidecraft.material.CraftingRecipe;
 import com.freedsuniverse.sidecraft.material.Material;
 import com.freedsuniverse.sidecraft.material.MaterialStack;
-import com.freedsuniverse.sidecraft.world.ActiveBlock;
+import com.freedsuniverse.sidecraft.world.Block;
 
-public class Workbench extends ActiveBlock{    
+public class Workbench extends Block{    
     private int x,y;
     
     private Rectangle OUTPUT;
@@ -53,11 +52,12 @@ public class Workbench extends ActiveBlock{
             for(int x = 0; x < craftingArea.length; x++){
                 for(int y =0; y < craftingArea[0].length; y++){
                     if(craftingArea[x][y].getContent() != null){
-                        new DropEntity(craftingArea[x][y].getContent().getType(), this.getLocation());
+                        new DropEntity(craftingArea[x][y].getContent().getType(), this.getLocation()).spawn();
                         craftingArea[x][y].setContent(null);
                     }
                 }
             }
+            outputSlot.setContent(null);
         }
         open = !open;  
     }
@@ -88,8 +88,9 @@ public class Workbench extends ActiveBlock{
                 for (int x = 0; x < Sidecraft.player.getInventory().getContents().length; x++) {
                     Rectangle box = new Rectangle(this.x + X_DIFF + (38 * x), this.y + Y_DIFF - (38 * y) + 1, 30, 30);
                     if (Sidecraft.player.getInventory().getContents()[x][y] != null) {
-                        Engine.addQueueItem(new RenderQueueItem(Sidecraft.player.getInventory().getContents()[x][y].getType().getImage(), box));
-                        Engine.addQueueItem(new RenderQueueItem(String.valueOf(Sidecraft.player.getInventory().getAt(x, y).getAmount()), (int)box.getCenterX() + 5, (int)box.getCenterY() - 1, Color.WHITE));                        
+                        Sidecraft.player.getInventory().getAt(x,y).draw(box, true);
+                        //Engine.addQueueItem(new RenderQueueItem(Sidecraft.player.getInventory().getContents()[x][y].getType().getImage(), box));
+                        //Engine.addQueueItem(new RenderQueueItem(String.valueOf(Sidecraft.player.getInventory().getAt(x, y).getAmount()), (int)box.getCenterX() + 5, (int)box.getCenterY() - 1, Color.WHITE));                        
                     }
                     if(box.contains(Mouse.getPoint())){
                         Engine.addQueueItem(new RenderQueueItem(box, PlayerInventory.HOVER_COLOR));
@@ -100,8 +101,9 @@ public class Workbench extends ActiveBlock{
             for(int x = 0; x < craftingArea.length; x++){
                 for(int y = 0; y < craftingArea[0].length; y++){
                     if(craftingArea[x][y].getContent() != null){
-                        Engine.addQueueItem(new RenderQueueItem(craftingArea[x][y].getContent().getType().getImage(), craftingArea[x][y].getBounds()));
-                        Engine.addQueueItem(new RenderQueueItem(String.valueOf(craftingArea[x][y].getContent().getAmount()), craftingArea[x][y].getBounds().x + 25, craftingArea[x][y].getBounds().y, Color.BLACK));
+                        craftingArea[x][y].getContent().draw(craftingArea[x][y].getBounds(), true);
+                        //Engine.addQueueItem(new RenderQueueItem(craftingArea[x][y].getContent().getType().getImage(), craftingArea[x][y].getBounds()));
+                        //Engine.addQueueItem(new RenderQueueItem(String.valueOf(craftingArea[x][y].getContent().getAmount()), craftingArea[x][y].getBounds().x + 25, craftingArea[x][y].getBounds().y, Color.BLACK));
                     }
                     if(craftingArea[x][y].getBounds().contains(Mouse.getPoint())){
                         Engine.addQueueItem(new RenderQueueItem(craftingArea[x][y].getBounds(), PlayerInventory.HOVER_COLOR));
@@ -110,8 +112,9 @@ public class Workbench extends ActiveBlock{
             }
             
             if(outputSlot.getContent() != null){
-                Engine.addQueueItem(new RenderQueueItem(outputSlot.getContent().getType().getImage(), OUTPUT));
-                Engine.addQueueItem(new RenderQueueItem(String.valueOf(outputSlot.getContent().getAmount()), OUTPUT.x + 25, OUTPUT.y, Color.BLACK));
+                //Engine.addQueueItem(new RenderQueueItem(outputSlot.getContent().getType().getImage(), OUTPUT));
+                //Engine.addQueueItem(new RenderQueueItem(String.valueOf(outputSlot.getContent().getAmount()), OUTPUT.x + 25, OUTPUT.y, Color.BLACK));
+                outputSlot.getContent().draw(OUTPUT, true);
             }
             
             if (onMouse != null) {
@@ -135,9 +138,7 @@ public class Workbench extends ActiveBlock{
     private void updateCrafting() {
         MaterialStack outcome = CraftingRecipe.getMatch(this.getRecipeData());
         
-        if(outcome != null){
-            this.outputSlot.setContent(outcome);
-        }
+        this.outputSlot.setContent(outcome);
     }
 
     private void updateContents(){

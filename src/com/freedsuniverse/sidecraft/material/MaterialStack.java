@@ -8,7 +8,7 @@ import com.freedsuniverse.sidecraft.engine.Engine;
 import com.freedsuniverse.sidecraft.engine.RenderQueueItem;
 
 public class MaterialStack {
-    public final static int DEFAULT_STACK_SIZE = 64;
+    public final static int DEFAULT_STACK_SIZE = 64, Y_OFFSET = 30, X_OFFSET = 20;
 
     private Material type;
 
@@ -33,7 +33,7 @@ public class MaterialStack {
 
     public void draw(Rectangle main) {
         Engine.render(main, getType().getImage());
-        Engine.renderString(String.valueOf(getAmount()), main.x + 5, main.y - 1, Color.WHITE);
+        Engine.renderString(String.valueOf(getAmount()), main.x + X_OFFSET, main.y + Y_OFFSET, Color.WHITE);
     }
 
     public void draw(int x, int y, boolean queue) {
@@ -42,7 +42,7 @@ public class MaterialStack {
             Engine.addQueueItem(i);
         }else{
             Engine.render(i);
-            Engine.renderString(String.valueOf(getAmount()), x + 5, y + 30, Color.WHITE);
+            Engine.renderString(String.valueOf(getAmount()), x + X_OFFSET, Y_OFFSET + y, Color.WHITE);
         }
     }
     
@@ -51,12 +51,14 @@ public class MaterialStack {
     }
 
     public void draw(Rectangle box, boolean queue) {
-        RenderQueueItem i = new RenderQueueItem(getType().getImage(), box);
+        RenderQueueItem texture = new RenderQueueItem(getType().getImage(), box);
+        RenderQueueItem text = new RenderQueueItem(String.valueOf(getAmount()), box.x + X_OFFSET, box.y + Y_OFFSET, Color.white);
         if(queue){
-            Engine.addQueueItem(i);
+            Engine.addQueueItem(texture);
+            Engine.addQueueItem(text);
         }else{
-            Engine.render(i);
-            Engine.renderString(String.valueOf(getAmount()), box.x + 5, box.y + 30, Color.WHITE);
+            Engine.render(texture);
+            Engine.render(text);
         } 
     }
 }

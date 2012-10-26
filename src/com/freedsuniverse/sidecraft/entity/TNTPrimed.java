@@ -21,14 +21,13 @@ public class TNTPrimed implements Entity {
     public TNTPrimed(Location loc, int fuseTicks, float power) {
         width = Settings.BLOCK_SIZE;
         height = Settings.BLOCK_SIZE;
+        location = loc;
         this.power = power;
         this.fuseTicks = fuseTicks;
-        spawn(loc);
     }
 
-    public void spawn(Location loc) {
-        this.location = loc;
-        loc.getWorld().registerEntity(this);
+    public void spawn() {
+        location.getWorld().registerEntity(this);
     }
 
     public void update() {
@@ -87,5 +86,10 @@ public class TNTPrimed implements Entity {
 
     public void explode() {
         Explosion.createExplosion(this.getLocation(), this.power);
+    }
+
+    @Override
+    public void setLocation(Location loc) {
+        this.location = loc;
     }
 }

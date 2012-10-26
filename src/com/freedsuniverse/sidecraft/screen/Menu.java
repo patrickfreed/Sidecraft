@@ -1,87 +1,51 @@
 package com.freedsuniverse.sidecraft.screen;
 
-import java.awt.Color;
-import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
-import java.util.HashMap;
+import java.awt.image.BufferedImage;
 
+import com.freedsuniverse.sidecraft.Settings;
 import com.freedsuniverse.sidecraft.Sidecraft;
 import com.freedsuniverse.sidecraft.engine.Engine;
 import com.freedsuniverse.sidecraft.input.Mouse;
 
+public class Menu extends Screen{   
+    private BufferedImage background;   
+    
+    private Button start, settings;
 
-public class Menu implements Screen{
-
-    private HashMap<Rectangle, Boolean> buttons;
-    
-    private Color selected, idle;
-    
-    private boolean visible;
-    
-    Rectangle START_GAME = new Rectangle(96, 100, 96, 32);
-    
     public Menu(){
-        visible = false;
-        buttons = new HashMap<Rectangle, Boolean>();
-        buttons.put(START_GAME, false);
-        selected = Color.cyan;
-        idle = Color.red;
+        start = new Button("Play game", Button.DEFAULT_TILE, Sidecraft.width / 2 - 32 * 4, Sidecraft.height / 2 + 16, 32*8, 32);
+        settings = new Button("Settings", Button.DEFAULT_TILE, Sidecraft.width / 2 - 32 * 4, Sidecraft.height / 2 + 54, 32*8, 32);
+        super.setVisible(false);
+        background = Sidecraft.getImage(Settings.MENU_BACKGROUND);
+        super.setBackgroundTile(Sidecraft.getImage(Settings.MENU_BACKGROUND_TILE));
     }
     
     @Override
     public void update() {
-        if(visible){
-            Point mouse = new Point(Mouse.getX(), Mouse.getY());
-
-            for(Rectangle r:buttons.keySet()){
-                if(r.contains(mouse)){
-                    buttons.put(r, true);
-                    if(Mouse.isDown(MouseEvent.BUTTON1)){
-                        useButton(r);
-                    }
-                }else{
-                    buttons.put(r, false);
+        if(isVisible()){
+            if(Mouse.clicked(MouseEvent.BUTTON1)){
+                if(start.getBounds().contains(Mouse.getPoint())){
+                    hide();
+                }else if(settings.getBounds().contains(Mouse.getPoint())){
+                    Sidecraft.currentScreen = new SettingsMenu(this);
                 }
             }
         } 
     }
-
-    @Override
-    public void useButton(Rectangle r) {
-        if(r == START_GAME){
-            hide();
-        }
-    }
-
-    @Override
-    public boolean isVisible(){
-        return visible;
-    }
     
     @Override
-    public void show() {
-        visible = true;
-        
-    }
-
-    @Override
-    public void hide() {
-        visible = false; 
-        Sidecraft.isScreen = false;
-    }
-
-    @Override
     public void draw() {
-        if(visible){
-            for(Rectangle r:buttons.keySet()){
-                if(buttons.get(r)){
-                    Engine.graphics.setColor(selected);    
-                }else{
-                    Engine.graphics.setColor(idle);
+        if(isVisible()){
+            for(int x = 0; x < (Sidecraft.width / 32) + 1; x++){
+                for(int y = 0; y < (Sidecraft.height / 32) + 1; y++){
+                    Engine.render(x * 32, y * 32, getBackgroundTile());
                 }
-                Engine.graphics.fillRect((int)r.getX(), (int)r.getY(), (int)r.getWidth(), (int)r.getHeight());
             }
+            Engine.render(Sidecraft.width / 2 - background.getWidth() / 2, 50, background);
+            
+            start.draw();
+            settings.draw();
         }
     }
 }

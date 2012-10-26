@@ -1,8 +1,10 @@
 package com.freedsuniverse.sidecraft.material;
 
 import java.awt.image.BufferedImage;
+import java.util.LinkedList;
 
 import com.freedsuniverse.sidecraft.Sidecraft;
+import com.freedsuniverse.sidecraft.Sound;
 
 public enum Material{
     AIR(0, 0, 0, 0, 0, false),
@@ -16,15 +18,42 @@ public enum Material{
     SILVER_ORE(8, 60),
     GOLD_ORE(9, 45),
     WATER(0, 0, 0, 0, 0, false),
-    TNT(0),
-    WORKBENCH(12, 45);
+    TNT(0, 1),
+    WORKBENCH(12);
     
     private int id, stack, damage, durability, dropamount, dropType;
     private BufferedImage img;
     private boolean solidity;
     
+    public static LinkedList<Integer> rock, sediment, glass;
+    
+    public static Sound getSound(int id){
+        if(rock == null){
+            Material[] values = Material.values();
+            
+            rock = sediment = glass = new LinkedList<Integer>();
+            
+            for(int x = 0; x < values.length; x++){
+                if(values[x].toString().contains("ORE") || values[x].toString().contains("STONE")){
+                    Material.rock.add(values[x].getId());
+                }else{
+                    Material.sediment.add(values[x].getId());
+                }
+            }
+        }
+        
+        if(rock.contains(id)){
+            return Sound.sedimentWalk;
+        }else if(sediment.contains(id)){
+            return Sound.sedimentWalk;
+        }else if(glass.contains(id)){
+            
+        }
+        return Sound.sedimentWalk;
+    }
+    
     private Material(int drpType){
-        this(drpType, 15);
+        this(drpType, 4);
     }
     
     private Material(int drpType, int dur){
@@ -68,6 +97,10 @@ public enum Material{
     
     public BufferedImage getImage(){
         return img;
+    }
+    
+    public Sound getDamageSound(){
+        return Sound.blockDamage;
     }
     
     public boolean isSolid(){

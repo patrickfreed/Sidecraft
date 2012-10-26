@@ -2,10 +2,13 @@ package com.freedsuniverse.sidecraft.entity;
 
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 
 import com.freedsuniverse.sidecraft.Settings;
 import com.freedsuniverse.sidecraft.Sidecraft;
+import com.freedsuniverse.sidecraft.engine.Animation;
 import com.freedsuniverse.sidecraft.engine.Engine;
 import com.freedsuniverse.sidecraft.input.Key;
 import com.freedsuniverse.sidecraft.input.Mouse;
@@ -13,25 +16,19 @@ import com.freedsuniverse.sidecraft.inventory.PlayerInventory;
 import com.freedsuniverse.sidecraft.inventory.Toolbar;
 import com.freedsuniverse.sidecraft.material.Material;
 import com.freedsuniverse.sidecraft.material.MaterialStack;
-import com.freedsuniverse.sidecraft.world.ActiveBlock;
 import com.freedsuniverse.sidecraft.world.Block;
 import com.freedsuniverse.sidecraft.world.Location;
 import com.freedsuniverse.sidecraft.world.World;
 import com.freedsuniverse.sidecraft.world.active.Workbench;
 
-public class Player implements Entity {
+public class Player extends LivingEntity {
     private final double RIGHT_ARM_LENGTH = 3;
-
-    public Rectangle ScreenPosition;
 
     private Toolbar toolbar;
     private PlayerInventory inventory;
 
     private BufferedImage texture;
-
-    //private static int milliseconds = 0;
-    //private float interval = 250f;
-
+    
     private int ySpeed, xSpeed, yDirection, xDirection;
     
     private double originalY;
@@ -39,21 +36,21 @@ public class Player implements Entity {
     private MovementState moveState;
     private ActionState action, oldAction;
 
+    private Animation[] animations;
+    
     final double JUMP_HEIGHT = 1.3;
+    final int ATTACK_DAMAGE = 1;
     final int LEFT = -1, UP = 1, RIGHT = 1, DOWN = -1, STABLE = 0, ARM_LENGTH = 4, IDLE = 0, BUSY = 1;
 
     private int MOVEMENT_SPEED;
-    float startX, startY, currentX, currentY, oldX, oldY;
+    
+    private long lastAttack;
+    
+    private boolean isAttacking = false, canDamage = true;
 
-    private int oldWheelValue, currentWheelValue;
+    private int oldWheelValue, currentWheelValue, currentAnimation;
 
     public String world;
-
-    public Location coordinates;
-
-    private boolean oldIState, oldBState;
-
-    private boolean iState, bState;
 
     enum MovementState {
         WALKING,
@@ -65,28 +62,18 @@ public class Player implements Entity {
         IDLE,
         BUSY
     }
-
+   
     public Player() {
         MOVEMENT_SPEED = Settings.BLOCK_SIZE / 8;
-        ScreenPosition = new Rectangle(Sidecraft.width/2, Sidecraft.height/2, Settings.BLOCK_SIZE, Settings.BLOCK_SIZE);
+        
+        this.setLocation(new Location(0, 0, "world"));
+        this.setBounds(new Rectangle(Sidecraft.width/2, Sidecraft.height/2, Settings.BLOCK_SIZE, Settings.BLOCK_SIZE));
 
         texture = Sidecraft.playerTile;
-        
-        startX = 388f;
-        startY = 224f;
-        currentX = startX;
-        currentY = startY;
+        loadTextures();
 
         xDirection = STABLE;
-        yDirection = STABLE;
-        
-        oldIState = false;
-        iState = false;
-        
-        oldBState = false;
-        bState = false;
-        
-        coordinates = new Location(0, 0, "world");
+        yDirection = STABLE;      
 
         oldWheelValue = Mouse.getScrollWheelValue();
 
@@ -98,30 +85,45 @@ public class Player implements Entity {
         oldAction = action;
     }
 
+    private void loadTextures(){
+        MovementState[] stuff = MovementState.values();
+        animations = new Animation[stuff.length];
+        for(int x = 0; x < stuff.length; x++){
+            animations[x] = new Animation(Animation.read("/player/texture/" + stuff[x].toString().toLowerCase() + "/" + stuff[x].toString().toLowerCase() + ".png", 32, 64), 10);
+        }
+        currentAnimation = 0;
+    }
+    
     @Override
     public void update() {
+        if(isAttacking){            
+            if(System.currentTimeMillis() - this.lastAttack >= this.getAttackSpeed()){
+                canDamage = true;
+                isAttacking = false;
+            }
+        }
+        
         oldWheelValue = currentWheelValue;
         currentWheelValue = Mouse.getScrollWheelValue();
-        
-        oldIState = iState;
-        iState = Key.I.isDown();
-        
-        oldBState = bState;
-        bState = Key.B.isDown();
         
         updateMovement();
         updateCollision();
         updateInteraction();
         updateToolbar();
-        updatePosition();
+        updatePosition(xDirection, yDirection, xSpeed, ySpeed);
+        animations[currentAnimation].update();
         
         if(oldAction != action){
             oldAction = action;
         }
     }
 
+	private long getAttackSpeed() {       
+        return 500;
+    }
+
     private void updateToolbar() {
-        if (currentWheelValue < oldWheelValue || (bState && !oldBState)) {
+        if (currentWheelValue < oldWheelValue || (Key.B.toggled())) {
             getToolbar().addToCurrentIndex(1);
         }
         else if (currentWheelValue > oldWheelValue) {
@@ -137,21 +139,21 @@ public class Player implements Entity {
 
     private void updateInteraction() {
         if (action != ActionState.BUSY) {
-            if(iState && !oldIState && oldAction != ActionState.BUSY){
+            if(Key.I.toggled() && oldAction != ActionState.BUSY){
                 setAction(BUSY);
                 inventory.open();
             }
             else if (Mouse.isDown(MouseEvent.BUTTON1)) {
                 Location mouseCoords = Location.valueOf(Mouse.getX(), Mouse.getY());
 
-                if (Math.abs(mouseCoords.getX() - coordinates.getX()) <= 4 && Math.abs(mouseCoords.getY() - coordinates.getY()) <= 4) {
+                if (Math.abs(mouseCoords.getX() - getLocation().getX()) <= 4 && Math.abs(mouseCoords.getY() - getLocation().getY()) <= 4) {
                     Block block = getWorld().getBlockAt(mouseCoords);
 
                     if (!block.getType().isSolid()) {
                         return;
                     } 
 
-                    getWorld().getBlockAt(mouseCoords).damage(5);
+                    attack(getWorld().getBlockAt(mouseCoords));
                 }
             }
             else if (Mouse.clicked(MouseEvent.BUTTON3)) {
@@ -170,14 +172,11 @@ public class Player implements Entity {
                         getInventory().setAt(getToolbar().getCurrentIndex(), 0, null);
                     }
                 }else{   
-                    if(block instanceof ActiveBlock){
-                        ActiveBlock activeBlock = (ActiveBlock) block;
-                        activeBlock.interact(this);
-                    }
+                    block.interact(this);
                 }
             }
         }else{
-            if (iState && !oldIState) {
+            if (Key.I.toggled()) {
                 setAction(IDLE);
                 getInventory().close();
             }
@@ -187,12 +186,8 @@ public class Player implements Entity {
         }
     }
 
-    /*
-     * To do: Clean up all of this to match new use of rectangles
-     */
-
     private void updateMovement() {
-        Location above = Location.valueOf(ScreenPosition.getCenterX(), ScreenPosition.y + Settings.BLOCK_SIZE / 8);
+        Location above = Location.valueOf(getBounds().getCenterX(), getBounds().y + Settings.BLOCK_SIZE / 8);
         
         if(action != ActionState.BUSY){
             if (Key.A.isDown() || Key.S.isDown()) {
@@ -208,14 +203,14 @@ public class Player implements Entity {
                 xSpeed = 0;
             }
 
-            int left = ScreenPosition.x;
-            int right = (int)ScreenPosition.getMaxX();
+            int left = getBounds().x;
+            int right = (int)getBounds().getMaxX();
 
-            Location leftFoot = Location.valueOf(left + Settings.BLOCK_SIZE / 8, ScreenPosition.getMaxY());
-            Location rightFoot = Location.valueOf(right - Settings.BLOCK_SIZE / 8, ScreenPosition.getMaxY());
+            Location leftFoot = Location.valueOf(left + Settings.BLOCK_SIZE / 8, getBounds().getMaxY());
+            Location rightFoot = Location.valueOf(right - Settings.BLOCK_SIZE / 8, getBounds().getMaxY());
 
-            //Location rightEar = Location.valueOf(right - Settings.BLOCK_SIZE / 8, ScreenPosition.getTop());
-            //Location leftEar = Location.valueOf(left + Settings.BLOCK_SIZE / 8, ScreenPosition.getTop());   
+            //Location rightEar = Location.valueOf(right - Settings.BLOCK_SIZE / 8, getBounds().getTop());
+            //Location leftEar = Location.valueOf(left + Settings.BLOCK_SIZE / 8, getBounds().getTop());   
 
             if (moveState == MovementState.WALKING) {
                 if (Key.SPACE.isDown()) {
@@ -223,8 +218,8 @@ public class Player implements Entity {
                     if (canJump) {
                         ySpeed = 4;
                         yDirection = UP;
-                        moveState = MovementState.JUMPING;
-                        originalY = coordinates.getY();
+                        setMovement(MovementState.JUMPING);
+                        originalY = getLocation().getY();
                     }
                 }
                 else {
@@ -234,13 +229,11 @@ public class Player implements Entity {
 
             }
         }else{
-            ySpeed = STABLE;
-            yDirection = STABLE;
             xDirection = STABLE;
             xSpeed = STABLE;
         }
-        if (moveState == MovementState.JUMPING && ((coordinates.getY() - this.originalY >= JUMP_HEIGHT) || getWorld().getBlockAt(above).getType().isSolid())) {
-            moveState = MovementState.FALLING;
+        if (moveState == MovementState.JUMPING && ((getLocation().getY() - this.originalY >= JUMP_HEIGHT) || getWorld().getBlockAt(above).getType().isSolid())) {
+            setMovement(MovementState.FALLING);
             ySpeed = 4;
             yDirection = DOWN;
             originalY = 0;
@@ -248,8 +241,8 @@ public class Player implements Entity {
     }
 
     private void updateCollision() {
-        Location leftFoot = Location.valueOf(ScreenPosition.x + (int)Math.floor((double)Settings.BLOCK_SIZE / 16), ScreenPosition.getMaxY());
-        Location rightFoot = Location.valueOf(ScreenPosition.getMaxX() - (int)Math.floor((double)Settings.BLOCK_SIZE / 16), ScreenPosition.getMaxY());
+        Location leftFoot = Location.valueOf(getBounds().x + (int)Math.floor((double)Settings.BLOCK_SIZE / 16), getBounds().getMaxY());
+        Location rightFoot = Location.valueOf(getBounds().getMaxX() - (int)Math.floor((double)Settings.BLOCK_SIZE / 16), getBounds().getMaxY());
 
         Block left = getWorld().getBlockAt(leftFoot);
         Block right = getWorld().getBlockAt(rightFoot);
@@ -258,13 +251,13 @@ public class Player implements Entity {
             if ((!left.getType().isSolid() && !right.getType().isSolid())) {
                 ySpeed = 4;
                 yDirection = DOWN;
-                moveState = MovementState.FALLING;
+                setMovement(MovementState.FALLING);
             }
         }
         else if (moveState == MovementState.FALLING) {
             if (left.getType().isSolid() || right.getType().isSolid()) {
                 ySpeed = 0;
-                moveState = MovementState.WALKING;
+                setMovement(MovementState.WALKING);
             }
         }
 
@@ -293,17 +286,6 @@ public class Player implements Entity {
         }
     }
 
-    private void updatePosition() {
-        oldX = currentX;
-        oldY = currentY;
-
-        currentX += xSpeed * xDirection;
-        currentY += ySpeed * yDirection;
-
-        coordinates.modifyX((currentX - oldX) / 32);
-        coordinates.modifyY((currentY - oldY) / 32);
-    }
-
     public void setAction(int i){
         oldAction = action;
         
@@ -314,13 +296,19 @@ public class Player implements Entity {
         }
     }
     
+    public void setMovement(MovementState s){
+        moveState = s;
+        currentAnimation = s.ordinal();
+    }
+    
+    @Override
     public void draw() {
-        Engine.render(coordinates, Settings.BLOCK_SIZE, Settings.BLOCK_SIZE, texture);
+        Engine.render(super.getLocation(), Settings.BLOCK_SIZE, Settings.BLOCK_SIZE, getSkin());
         
         MaterialStack itemInHand = getInventory().getAt(getToolbar().getCurrentIndex(), 0);
 
         if(itemInHand != null){
-            Engine.render(new Rectangle((int)ScreenPosition.getMaxX(), ScreenPosition.y, 16, 16), itemInHand.getType().getImage());
+            Engine.render(new Rectangle((int)getBounds().getMaxX(), getBounds().y, 16, 16), itemInHand.getType().getImage());
         }
 
         Location mouseCoords = Location.valueOf(Mouse.getX(), Mouse.getY());
@@ -329,8 +317,9 @@ public class Player implements Entity {
         getInventory().draw();
         
         if(action != ActionState.BUSY){
-            if (Math.abs(mouseCoords.getX() - coordinates.getX()) <= 4 && Math.abs(mouseCoords.getY() - coordinates.getY()) <= 4)
-                Engine.render(getWorld().getBlockAt(mouseCoords).getLocation(), Settings.BLOCK_SIZE, Settings.BLOCK_SIZE, Sidecraft.selectionTile);
+            if (Math.abs(mouseCoords.getX() - getLocation().getX()) <= 4 && Math.abs(mouseCoords.getY() - getLocation().getY()) <= 4)
+                if(!Sidecraft.isPaused)
+                    Engine.render(mouseCoords.getWorld().getBlockAt(mouseCoords).getLocation(), Settings.BLOCK_SIZE, Settings.BLOCK_SIZE, Sidecraft.selectionTile);
         }
     }
 
@@ -342,6 +331,7 @@ public class Player implements Entity {
         return this.toolbar;
     }
 
+    @Deprecated
     public World getWorld() {
         return Sidecraft.worlds.get(world);
     }
@@ -350,18 +340,48 @@ public class Player implements Entity {
         return getToolbar().getSelectedObj() != null && !block.getType().isSolid();
     }
 
-    public Rectangle getBounds() {
-        return ScreenPosition;
-    }
-
-    public Location getLocation() {
-        return this.coordinates;
-    }
-
     public BufferedImage getSkin() {
-        return this.texture;
+        if(xSpeed == 0 && ySpeed == 0){
+            return this.texture;
+        }else{
+            if(xDirection == RIGHT){
+                return animations[currentAnimation].getSlide();
+            }else if(xDirection == LEFT){
+                AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
+                tx.translate(-animations[currentAnimation].getSlide().getWidth(null), 0);
+                AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+                return op.filter(animations[currentAnimation].getSlide(), null);           
+            }
+        }
+        return texture;
     }
 
+    public void attack(Entity e){
+        if(!canDamage) return;
+        
+        if(e instanceof Block){
+            Block b = (Block) e;
+            b.damage(getDamage());
+            isAttacking = true;
+            lastAttack = System.currentTimeMillis();
+            canDamage = false;
+        }
+    }
+    
+    private int getDamage() {
+        MaterialStack mat = this.getToolbar().getSelectedObj();
+        
+        if(mat != null){
+            return mat.getType().getDamage();
+        }
+        return ATTACK_DAMAGE;
+    }
+
+    @Override
+    public void damage(int d){
+    }
+    
+    @Override
     public void destroy() {
         //Todo
     }

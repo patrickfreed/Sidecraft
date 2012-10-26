@@ -22,4 +22,9 @@ package net.royawesome.jlibnoise.exception;
 
 public class NoModuleException extends NoiseException {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
 }

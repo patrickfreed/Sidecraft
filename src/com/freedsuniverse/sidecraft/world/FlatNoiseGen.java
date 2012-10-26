@@ -14,7 +14,7 @@ public class FlatNoiseGen {
 	public static final Material STONE = Material.STONE;
 	public static final Material AIR = Material.AIR;
 
-	public int seed = 2525353;
+	public int seed;
 	public double threshold = 0.0;
 	public double scale = 16.0;
 	public int surface = 10;
@@ -23,6 +23,11 @@ public class FlatNoiseGen {
 	/** Random used for population */
 	public Random pRnd = new Random();
 
+	public FlatNoiseGen(){
+	    seed = new Random().nextInt(10000000 - 1000000) + 1000000;
+	    
+	}
+	
 	public double noise(int x, int y) {
 		return Noise.GradientCoherentNoise3D(x/(scale*2), y/scale, 0, seed, NoiseQuality.BEST);
 	}

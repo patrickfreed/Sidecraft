@@ -23,8 +23,7 @@ public class DropEntity implements Entity{
     public DropEntity(Material t, Location loc) {
         HEIGHT = Settings.BLOCK_SIZE / 2;
         WIDTH = Settings.BLOCK_SIZE / 2;
-        Location newLoc = new Location(loc.getX(), loc.getY(), loc.getWorld().getName());
-        spawn(newLoc);
+        location = new Location(loc.getX(), loc.getY(), loc.getWorld().getName());
         type = t;
     }
 
@@ -32,30 +31,27 @@ public class DropEntity implements Entity{
         location = new Location(x, y, world.getName());
         type = t; HEIGHT = Settings.BLOCK_SIZE / 2;
         WIDTH = Settings.BLOCK_SIZE / 2;
-        spawn(location);
     }
 
     public DropEntity(Material t, double x, double y) {
         HEIGHT = Settings.BLOCK_SIZE / 2;
         WIDTH = Settings.BLOCK_SIZE / 2;
         type = t;
-        Location location = new Location(x, y);
-        spawn(location);
+        location = new Location(x, y);
     }
 
-    public void spawn(Location loc) {
-        this.location = loc;
-        while (this.location.getWorld().getBlockAt(loc.modify(0, -0.5)).getType().isSolid()) {
-            loc.modifyY(1);
+    public void spawn() {
+        while (this.location.getWorld().getBlockAt(location.modify(0, -0.5)).getType().isSolid()) {
+            location.modifyY(1);
         }
        
-        loc.getWorld().registerEntity(this);
+        location.getWorld().registerEntity(this);
     }
 
     @Override
     public void update() {     
         
-        boolean playerSide = Sidecraft.player.coordinates.getX() > getLocation().getX();
+        boolean playerSide = Sidecraft.player.getLocation().getX() > getLocation().getX();
         
         Block nextBlockY = this.getLocation().getWorld().getBlockAt(new Location(location.getX(), location.getY() - 0.5));
         Block nextBlockX;
@@ -70,8 +66,8 @@ public class DropEntity implements Entity{
             location.modifyY(-0.1);
         }
 
-        double xDistance = Math.abs(Sidecraft.player.coordinates.getX() - getLocation().getX());
-        double yDistance = Math.abs(Sidecraft.player.coordinates.getY() - getLocation().getY());
+        double xDistance = Math.abs(Sidecraft.player.getLocation().getX() - getLocation().getX());
+        double yDistance = Math.abs(Sidecraft.player.getLocation().getY() - getLocation().getY());
         
         if(xDistance > 0.3 && yDistance > 0.3){
             if (xDistance <= REACH_DISTANCE && yDistance <= REACH_DISTANCE && !nextBlockX.getType().isSolid()) {
@@ -101,7 +97,14 @@ public class DropEntity implements Entity{
         return this.location;
     }
 
+    
+    
     public Rectangle getBounds() {
         return location.toRectangle(WIDTH, HEIGHT);
+    }
+
+    @Override
+    public void setLocation(Location l) {
+        this.location = l; 
     }
 }

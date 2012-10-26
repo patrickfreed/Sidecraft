@@ -2,7 +2,6 @@ package com.freedsuniverse.sidecraft.world;
 
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Random;
 
 import com.freedsuniverse.sidecraft.Settings;
 import com.freedsuniverse.sidecraft.Sidecraft;
@@ -13,7 +12,6 @@ public class World {
     private HashMap<String, Block> blocks;
 
     private LinkedList<Entity> entities;
-    private LinkedList<String> actives;
     
     private String name;
 
@@ -21,7 +19,7 @@ public class World {
     private int yLength;
     
     // codename_B's noise gen
-    FlatNoiseGen gen = new FlatNoiseGen();
+    private FlatNoiseGen gen = new FlatNoiseGen();
 
     public World(String n) {
         this.name = n;
@@ -29,11 +27,14 @@ public class World {
         this.xLength = Sidecraft.width / Settings.BLOCK_SIZE;
         this.yLength = Sidecraft.height / Settings.BLOCK_SIZE;
 
-        actives = new LinkedList<String>();
         entities = new LinkedList<Entity>();
-        draw();
+        update();
     }
 
+    public int getSeed(){
+        return gen.seed;
+    }
+    
     public String getName() {
         return name;
     }
@@ -49,10 +50,6 @@ public class World {
         
         blocks.put(x + "," + y, b);
         blocks.get(x + "," + y).setLocation(loc);
-        
-        if(b instanceof ActiveBlock){
-            actives.add(x + "," + y);
-        }
     }
     
     public Block getBlockAt(Location coordinates) {
@@ -68,7 +65,7 @@ public class World {
     }
 
     protected int oreAmountAround(int x, int y) {
-	int oreCount = 0;
+        int oreCount = 0;
         Block left = blocks.get((x - 1) + "," + y);
         if (left != null && isOre(left.getType())) oreCount++;
         Block right = blocks.get((x + 1) + "," + y);
@@ -90,16 +87,26 @@ public class World {
     }
 
     private void updateBlocks() {
-        for(int x = 0; x < actives.size(); x++){
-            ActiveBlock b = (ActiveBlock)blocks.get(actives.get(x));
-            b.update();
+        Location upperExtreme = new Location(Math.floor(Sidecraft.player.getLocation().getX()) + xLength / 2 + 1, Math.ceil((Sidecraft.player.getLocation().getY() + yLength / 2) + 1), this.getName());
+        Location lowerExtreme = new Location(Math.floor(Sidecraft.player.getLocation().getX()) - xLength / 2 - 1, Math.ceil((Sidecraft.player.getLocation().getY() - yLength / 2) - 1), this.getName());
+
+        int xDistance = (int)Math.abs(upperExtreme.getX() - lowerExtreme.getX());
+        int yDistance = (int)Math.abs(upperExtreme.getY() - lowerExtreme.getY());
+
+        for (int x = 0; x <= xDistance; x++) {
+            for (int y = 0; y <= yDistance; y++) {
+                double xCoord = upperExtreme.getX() + increment(x, (int)upperExtreme.getX(), (int)lowerExtreme.getX());
+                double yCoord = upperExtreme.getY() + increment(y, (int)upperExtreme.getY(), (int)lowerExtreme.getY());
+
+                getBlockAt(new Location(xCoord, yCoord, getName())).update();
+            }
         }
         
     }
 
     public void generateWorld(){
-        Location upperExtreme = new Location(Math.floor(Sidecraft.player.coordinates.getX()) + xLength / 2 + 1, Math.ceil((Sidecraft.player.coordinates.getY() + yLength / 2) + 1), this.getName());
-        Location lowerExtreme = new Location(Math.floor(Sidecraft.player.coordinates.getX()) - xLength / 2 - 1, Math.ceil((Sidecraft.player.coordinates.getY() - yLength / 2) - 1), this.getName());
+        Location upperExtreme = new Location(Math.floor(Sidecraft.player.getLocation().getX()) + xLength / 2 + 1, Math.ceil((Sidecraft.player.getLocation().getY() + yLength / 2) + 1), this.getName());
+        Location lowerExtreme = new Location(Math.floor(Sidecraft.player.getLocation().getX()) - xLength / 2 - 1, Math.ceil((Sidecraft.player.getLocation().getY() - yLength / 2) - 1), this.getName());
         
         int xDistance = (int)Math.abs(upperExtreme.getX() - lowerExtreme.getX());
         int yDistance = (int)Math.abs(upperExtreme.getY() - lowerExtreme.getY());
@@ -121,8 +128,8 @@ public class World {
     }
 
     public void draw() {
-        Location upperExtreme = new Location(Math.floor(Sidecraft.player.coordinates.getX()) + xLength / 2 + 1, Math.ceil((Sidecraft.player.coordinates.getY() + yLength / 2) + 1), this.getName());
-        Location lowerExtreme = new Location(Math.floor(Sidecraft.player.coordinates.getX()) - xLength / 2 - 1, Math.ceil((Sidecraft.player.coordinates.getY() - yLength / 2) - 1), this.getName());
+        Location upperExtreme = new Location(Math.floor(Sidecraft.player.getLocation().getX()) + xLength / 2 + 1, Math.ceil((Sidecraft.player.getLocation().getY() + yLength / 2) + 1), this.getName());
+        Location lowerExtreme = new Location(Math.floor(Sidecraft.player.getLocation().getX()) - xLength / 2 - 1, Math.ceil((Sidecraft.player.getLocation().getY() - yLength / 2) - 1), this.getName());
 
         int xDistance = (int)Math.abs(upperExtreme.getX() - lowerExtreme.getX());
         int yDistance = (int)Math.abs(upperExtreme.getY() - lowerExtreme.getY());
