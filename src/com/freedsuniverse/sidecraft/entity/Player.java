@@ -303,7 +303,7 @@ public class Player extends LivingEntity {
     
     @Override
     public void draw() {
-        Engine.render(super.getLocation(), Settings.BLOCK_SIZE, Settings.BLOCK_SIZE, getSkin());
+        Engine.render(getLocation(), Settings.BLOCK_SIZE, Settings.BLOCK_SIZE, getSkin());
         
         MaterialStack itemInHand = getInventory().getAt(getToolbar().getCurrentIndex(), 0);
 
@@ -337,7 +337,7 @@ public class Player extends LivingEntity {
     }
 
     private boolean canPlaceBlock(Block block) {
-        return getToolbar().getSelectedObj() != null && !block.getType().isSolid();
+        return getToolbar().getSelectedObj() != null && !block.getType().isSolid() && Math.abs(block.getLocation().getX() - getLocation().getX()) <= 4 && Math.abs(block.getLocation().getY() - getLocation().getY()) <= 4;
     }
 
     public BufferedImage getSkin() {
