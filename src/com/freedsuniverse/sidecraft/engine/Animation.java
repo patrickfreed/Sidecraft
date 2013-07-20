@@ -17,7 +17,6 @@ public class Animation {
             for(int x = 0; x < img.getWidth() / width; x++) {                
                 results[c] = img.getSubimage(x * width, y * height, width, height);
                 c++;
-                System.out.println(c);
             }
         }
         

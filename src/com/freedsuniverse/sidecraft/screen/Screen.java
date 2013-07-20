@@ -1,47 +1,26 @@
 package com.freedsuniverse.sidecraft.screen;
 
-import java.awt.Rectangle;
+import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
-import com.freedsuniverse.sidecraft.Sidecraft;
+import javax.swing.JPanel;
 
-public class Screen {   
-    private BufferedImage backgroundTile;
+import com.freedsuniverse.sidecraft.Main;
+import com.freedsuniverse.sidecraft.Settings;
+
+public class Screen extends JPanel {
+    private static final long serialVersionUID = -4312314981973034251L;
     
-    private boolean visible;
+    private BufferedImage img = Main.getImage(Settings.MENU_BACKGROUND_TILE);
     
-    
-    public void update() {
-    }
-
-    public void useButton(Rectangle r) {
-    }
-
-    public boolean isVisible(){
-        return visible;
-    }
-    
-    public void show() {
-        setVisible(true);
-    }
-
-    public void hide() {
-        setVisible(false); 
-        Sidecraft.isPaused = false;
-    }
-    
-    public void draw() {
-    }
-
-    public void setVisible(boolean visible) {
-        this.visible = visible;
-    }
-
-    public BufferedImage getBackgroundTile() {
-        return backgroundTile;
-    }
-
-    public void setBackgroundTile(BufferedImage backgroundTile) {
-        this.backgroundTile = backgroundTile;
+    @Override
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        
+        for(int x = 0; x < this.getWidth(); x+=32) {
+            for(int y = 0; y < this.getHeight(); y+=32) {
+                g.drawImage(img, x, y, null);
+            }
+        }
     }
 }

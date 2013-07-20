@@ -1,19 +1,20 @@
 package com.freedsuniverse.sidecraft.world;
 
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.text.DecimalFormat;
 
+import com.freedsuniverse.sidecraft.Main;
 import com.freedsuniverse.sidecraft.Settings;
-import com.freedsuniverse.sidecraft.Sidecraft;
 
 public class Location {
     private double x, y;
-    private String world;
-
+    public String world;
+    
     public Location(double x, double y) {
         this.x = x;
         this.y = y;
-        this.world = Sidecraft.player.getLocation().getWorld().getName();
+        this.world = Main.getGame().player.getLocation().getWorld().getName();
     }
 
     public Location(double x, double y, String world) {
@@ -24,18 +25,11 @@ public class Location {
 
     public static Location valueOf(Rectangle rect) {
         return valueOf(rect.getX(), rect.getY());
-    }
-
-    public static Location valueOf(double d, double e) {
-        double x = (d - Sidecraft.player.getBounds().getX()) / Settings.BLOCK_SIZE + Sidecraft.player.getLocation().getX();
-        double y = (e - Sidecraft.player.getBounds().getY()) / -Settings.BLOCK_SIZE + Sidecraft.player.getLocation().getY();
-
-        return new Location(x, y);
-    }
+    }   
 
     public int[] toArray() {
-        int x = (int) ((this.x - Sidecraft.player.getLocation().getX()) * Settings.BLOCK_SIZE + Sidecraft.player.getBounds().getX());
-        int y = (int) (Sidecraft.player.getBounds().getY() - ((this.y - Sidecraft.player.getLocation().getY()) * Settings.BLOCK_SIZE));
+        int x = (int) ((this.x - Main.getGame().player.getLocation().getX()) * Settings.BLOCK_SIZE + Main.getGame().player.getBounds().getX());
+        int y = (int) (Main.getGame().player.getBounds().getY() - ((this.y - Main.getGame().player.getLocation().getY()) * Settings.BLOCK_SIZE));
 
         return new int[]{x,y};
     }
@@ -48,7 +42,7 @@ public class Location {
 
     public String toString() {
         DecimalFormat fmt = new DecimalFormat("0.#");
-        return "{X:" + fmt.format(x) + "" + " Y:" + fmt.format(y) + "}";
+        return fmt.format(x) + ":" + fmt.format(y) + ":" + this.world;
     }
 
     public Location modify(double x, double y) {
@@ -84,6 +78,10 @@ public class Location {
         this.y = y;
     }
 
+    public boolean equals(Location l) {
+        return l.getX() == this.x && l.getY() == this.y && l.getWorldName().equalsIgnoreCase(this.world);
+    }
+    
     public boolean intersects(Location otherLocation) {
         if(otherLocation.getWorld().getName().equals(world)){
             return Math.floor(this.getX()) - Math.floor(otherLocation.getX()) == 0 && Math.floor(this.getY()) - Math.floor(otherLocation.getY()) == 0;
@@ -95,7 +93,30 @@ public class Location {
         return getWorld().getBlockAt(this);
     }
     
-    public World getWorld() {
-        return Sidecraft.worlds.get(world);
+    public String getWorldName() {
+        return world;
     }
+    
+    public World getWorld() {
+        return Main.getGame().worlds.get(world);
+    }
+    
+    public String getId() {
+        return (int) Math.floor(x) + "," + (int) Math.ceil(y);
+    }
+    
+    public static Location valueOf(double d, double e) {
+        double x = (d - Main.getGame().player.getBounds().getX()) / Settings.BLOCK_SIZE + Main.getGame().player.getLocation().getX();
+        double y = (e - Main.getGame().player.getBounds().getY()) / -Settings.BLOCK_SIZE + Main.getGame().player.getLocation().getY();
+
+        return new Location(x, y);
+    }
+
+    public static Location valueOf(Point point) {
+        return valueOf(point.x, point.y);
+    }
+
+    public double getDistance(Location location) {
+        return Math.sqrt(Math.pow(x - location.getX(), 2) + Math.pow(y - location.getY(), 2));
+    } 
 }

@@ -3,12 +3,14 @@ package com.freedsuniverse.sidecraft.input;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 
+import com.freedsuniverse.sidecraft.Main;
+
 public class Mouse {
     private static boolean m1 = false, oldm1 = false, currentm1 = false, m2 = false, oldm2 = false, currentm2 = false, m3 = false, oldm3 = false, currentm3 = false;
     private static int x = 0,y = 0,w = 0;
     
     public static Point getPoint(){
-        return new Point(x, y);
+        return Main.contentPane.getMousePosition();
     }
     
     public static void modifyScrollWheelValue(int a){

@@ -3,14 +3,14 @@ package com.freedsuniverse.sidecraft.material;
 import java.awt.image.BufferedImage;
 import java.util.LinkedList;
 
-import com.freedsuniverse.sidecraft.Sidecraft;
+import com.freedsuniverse.sidecraft.Main;
 import com.freedsuniverse.sidecraft.Sound;
 
 public enum Material{
     AIR(0, 0, 0, 0, 0, false),
     GRASS(2),
     DIRT(2),
-    STONE(3, 45),
+    STONE(3, 40),
     IRON_ORE(4, 45),
     OBSIDIAN(5, 100),
     SAND(6, 10),
@@ -19,10 +19,13 @@ public enum Material{
     GOLD_ORE(9, 45),
     WATER(0, 0, 0, 0, 0, false),
     TNT(0, 1),
-    WORKBENCH(12);
+    WORKBENCH(12), 
+    PICKAXE(13);
+    
+    public static final int LIQUID = 0, SEDIMENT = 1, ROCK = 2;
     
     private int id, stack, damage, durability, dropamount, dropType;
-    private BufferedImage img;
+
     private boolean solidity;
     
     public static LinkedList<Integer> rock, sediment, glass;
@@ -30,7 +33,6 @@ public enum Material{
     public static Sound getSound(int id){
         if(rock == null){
             Material[] values = Material.values();
-            
             rock = sediment = glass = new LinkedList<Integer>();
             
             for(int x = 0; x < values.length; x++){
@@ -62,7 +64,6 @@ public enum Material{
     
     private Material(int drpType, int dur, int stack, int dmg, int drp, boolean solid){
         this.id = this.ordinal();
-        this.img = Sidecraft.textures.get(id);
         this.stack = stack;
         this.damage = dmg;
         this.durability = dur;
@@ -87,6 +88,16 @@ public enum Material{
         return durability;
     }
     
+    public int getMaterialType() {
+        if(durability >= Material.STONE.getDurability()) {
+            return ROCK;
+        }else if(durability > 0) {
+            return SEDIMENT;
+        }else {
+            return LIQUID;
+        }
+    }
+    
     public int getDropAmount(){
         return dropamount;
     }
@@ -96,7 +107,7 @@ public enum Material{
     }
     
     public BufferedImage getImage(){
-        return img;
+        return Main.textures.get(id);
     }
     
     public Sound getDamageSound(){

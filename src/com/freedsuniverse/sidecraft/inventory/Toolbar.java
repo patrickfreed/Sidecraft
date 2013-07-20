@@ -4,9 +4,9 @@ import java.awt.Color;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
-import com.freedsuniverse.sidecraft.Sidecraft;
+import com.freedsuniverse.sidecraft.Main;
 import com.freedsuniverse.sidecraft.engine.Engine;
-import com.freedsuniverse.sidecraft.material.MaterialStack;
+import com.freedsuniverse.sidecraft.material.Item;
 
 public class Toolbar {
     private int currentIndex;
@@ -21,12 +21,11 @@ public class Toolbar {
 
     public Toolbar() {
         this.currentIndex = 0;
-        x = Sidecraft.width / 2 - Sidecraft.toolbarTile.getWidth() / 2;
-        y = Sidecraft.height - 60;
-        //boxes = new Rectangle[]{BOX_ONE, BOX_TWO, BOX_THREE, BOX_FOUR, BOX_FIVE};
+        x = Main.getPaneWidth() / 2 - Main.toolbarTile.getWidth() / 2;
+        y = Main.getPaneHeight() - 100;
         boxes = new Rectangle[5];
         createRectangles();
-        tile = Sidecraft.toolbarSelectionTile;
+        tile = Main.toolbarSelectionTile;
     }
 
     private void createRectangles(){
@@ -35,8 +34,8 @@ public class Toolbar {
         }
     }
     
-    public MaterialStack getSelectedObj() {
-        return Sidecraft.player.getInventory().getAt(currentIndex, 0);
+    public Item getSelectedObj() {
+        return Main.getGame().player.getInventory().getAt(currentIndex, 0);
     }
 
     public int getCurrentIndex() {
@@ -65,11 +64,11 @@ public class Toolbar {
         currentIndex = newIndex % 5;
     }
 
-    public void Draw() {
-        Engine.render(x, y, Sidecraft.toolbarTile);
+    public void draw() {
+        Engine.render(x, y, Main.toolbarTile);
 
         for (int x = 0; x < boxes.length; x++) {
-            MaterialStack item = Sidecraft.player.getInventory().getAt(x, 0);
+            Item item = Main.getGame().player.getInventory().getAt(x, 0);
 
             if (item != null) {
                 Engine.render(boxes[x], item.getType().getImage());
@@ -79,7 +78,7 @@ public class Toolbar {
                 }
 
                 if (item.getAmount() > 0)
-                    Engine.renderString(String.valueOf(Sidecraft.player.getInventory().getAt(x, 0).getAmount()), (int)boxes[x].getCenterX() + 5, (int)boxes[x].getCenterY() - 1, Color.WHITE);
+                    Engine.renderString(String.valueOf(Main.getGame().player.getInventory().getAt(x, 0).getAmount()), (int)boxes[x].getCenterX() + 5, (int)boxes[x].getCenterY() - 1, Color.WHITE);
             }
             else {
                 if (x == currentIndex) {

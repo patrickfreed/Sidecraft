@@ -4,16 +4,18 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 
-import com.freedsuniverse.sidecraft.Sidecraft;
+import com.freedsuniverse.sidecraft.Main;
 import com.freedsuniverse.sidecraft.engine.Engine;
 import com.freedsuniverse.sidecraft.engine.RenderQueueItem;
 import com.freedsuniverse.sidecraft.entity.DropEntity;
 import com.freedsuniverse.sidecraft.entity.Entity;
+import com.freedsuniverse.sidecraft.entity.Player;
 import com.freedsuniverse.sidecraft.input.Key;
 import com.freedsuniverse.sidecraft.input.Mouse;
-import com.freedsuniverse.sidecraft.inventory.PlayerInventory;
+import com.freedsuniverse.sidecraft.inventory.EntityInventory;
 import com.freedsuniverse.sidecraft.inventory.Slot;
 import com.freedsuniverse.sidecraft.material.CraftingRecipe;
+import com.freedsuniverse.sidecraft.material.Item;
 import com.freedsuniverse.sidecraft.material.Material;
 import com.freedsuniverse.sidecraft.material.MaterialStack;
 import com.freedsuniverse.sidecraft.world.Block;
@@ -21,7 +23,7 @@ import com.freedsuniverse.sidecraft.world.Block;
 public class Workbench extends Block{    
     private int x,y;
     
-    private Rectangle OUTPUT;
+    private Rectangle outputBox;
     
     final int X_DIFF = 13;
     final int Y_DIFF = 254;
@@ -31,7 +33,7 @@ public class Workbench extends Block{
     private Slot[][] craftingArea;
     private Slot outputSlot;
     
-    private MaterialStack onMouse;
+    private Item onMouse;
 
     public Workbench() {
         super(Material.WORKBENCH);
@@ -40,14 +42,14 @@ public class Workbench extends Block{
     @Override
     public void interact(Entity e){    
         if(!open){
-            Sidecraft.player.setAction(1);
-            x = Sidecraft.width / 2 - Sidecraft.inventoryTile.getWidth() / 2;
-            y = Sidecraft.height / 2 - Sidecraft.inventoryTile.getHeight() / 2;
-            OUTPUT = new Rectangle(x + Sidecraft.workbenchTile.getWidth() - 49, y + 53, 31, 31);
-            outputSlot = new Slot(null, OUTPUT);
+            ((Player) e).setAction(1);
+            x = Main.getGame().width / 2 - Main.inventoryTile.getWidth() / 2;
+            y = Main.getGame().height / 2 - Main.inventoryTile.getHeight() / 2;
+            outputBox = new Rectangle(x + Main.workbenchTile.getWidth() - 49, y + 53, 31, 31);
+            outputSlot = new Slot(null, outputBox);
             initiateBench();
         }else{
-            Sidecraft.player.setAction(0);
+            Main.getGame().player.setAction(0);
             
             for(int x = 0; x < craftingArea.length; x++){
                 for(int y =0; y < craftingArea[0].length; y++){
@@ -82,18 +84,16 @@ public class Workbench extends Block{
         super.draw();
         
         if(open){
-            Engine.addQueueItem(new RenderQueueItem(x, y, Sidecraft.workbenchTile));            
+            Engine.addQueueItem(new RenderQueueItem(x, y, Main.workbenchTile));            
             
-            for (int y = 0; y < Sidecraft.player.getInventory().getContents()[0].length; y++) {
-                for (int x = 0; x < Sidecraft.player.getInventory().getContents().length; x++) {
+            for (int y = 0; y < Main.getGame().player.getInventory().getContents()[0].length; y++) {
+                for (int x = 0; x < Main.getGame().player.getInventory().getContents().length; x++) {
                     Rectangle box = new Rectangle(this.x + X_DIFF + (38 * x), this.y + Y_DIFF - (38 * y) + 1, 30, 30);
-                    if (Sidecraft.player.getInventory().getContents()[x][y] != null) {
-                        Sidecraft.player.getInventory().getAt(x,y).draw(box, true);
-                        //Engine.addQueueItem(new RenderQueueItem(Sidecraft.player.getInventory().getContents()[x][y].getType().getImage(), box));
-                        //Engine.addQueueItem(new RenderQueueItem(String.valueOf(Sidecraft.player.getInventory().getAt(x, y).getAmount()), (int)box.getCenterX() + 5, (int)box.getCenterY() - 1, Color.WHITE));                        
+                    if (Main.getGame().player.getInventory().getContents()[x][y] != null) {
+                        Main.getGame().player.getInventory().getAt(x,y).draw(box, true);                        
                     }
                     if(box.contains(Mouse.getPoint())){
-                        Engine.addQueueItem(new RenderQueueItem(box, PlayerInventory.HOVER_COLOR));
+                        Engine.addQueueItem(new RenderQueueItem(box, EntityInventory.HOVER_COLOR));
                     }
                 }
             }
@@ -102,19 +102,15 @@ public class Workbench extends Block{
                 for(int y = 0; y < craftingArea[0].length; y++){
                     if(craftingArea[x][y].getContent() != null){
                         craftingArea[x][y].getContent().draw(craftingArea[x][y].getBounds(), true);
-                        //Engine.addQueueItem(new RenderQueueItem(craftingArea[x][y].getContent().getType().getImage(), craftingArea[x][y].getBounds()));
-                        //Engine.addQueueItem(new RenderQueueItem(String.valueOf(craftingArea[x][y].getContent().getAmount()), craftingArea[x][y].getBounds().x + 25, craftingArea[x][y].getBounds().y, Color.BLACK));
                     }
                     if(craftingArea[x][y].getBounds().contains(Mouse.getPoint())){
-                        Engine.addQueueItem(new RenderQueueItem(craftingArea[x][y].getBounds(), PlayerInventory.HOVER_COLOR));
+                        Engine.addQueueItem(new RenderQueueItem(craftingArea[x][y].getBounds(), EntityInventory.HOVER_COLOR));
                     }
                 }
             }
             
             if(outputSlot.getContent() != null){
-                //Engine.addQueueItem(new RenderQueueItem(outputSlot.getContent().getType().getImage(), OUTPUT));
-                //Engine.addQueueItem(new RenderQueueItem(String.valueOf(outputSlot.getContent().getAmount()), OUTPUT.x + 25, OUTPUT.y, Color.BLACK));
-                outputSlot.getContent().draw(OUTPUT, true);
+                outputSlot.getContent().draw(outputBox, true);
             }
             
             if (onMouse != null) {
@@ -123,7 +119,6 @@ public class Workbench extends Block{
         }
     }
     
-    //TODO: Make mor prity
     @Override
     public void update(){
         if(open){
@@ -145,13 +140,13 @@ public class Workbench extends Block{
         if(Mouse.clicked(MouseEvent.BUTTON1) || Mouse.clicked(MouseEvent.BUTTON3)){
             if(getSelectedIndecies()[0] != -1){
                 int index[] = getSelectedIndecies();
-                MaterialStack[] handledMaterials = PlayerInventory.handleSlot(Sidecraft.player.getInventory().getAt(index[0], index[1]), onMouse);
+                Item[] handledMaterials = EntityInventory.handleSlot(Main.getGame().player.getInventory().getAt(index[0], index[1]), onMouse);
                 
-                Sidecraft.player.getInventory().setAt(index[0], index[1], handledMaterials[0]);
+                Main.getGame().player.getInventory().setAt(index[0], index[1], handledMaterials[0]);
                 onMouse = handledMaterials[1];
             }else if(getWorkbenchSlot() != null){
                 Slot slot = getWorkbenchSlot();
-                MaterialStack[] handledMaterials = PlayerInventory.handleSlot(slot.getContent(), onMouse);
+                Item[] handledMaterials = EntityInventory.handleSlot(slot.getContent(), onMouse);
                 
                 slot.setContent(handledMaterials[0]);
                 onMouse = handledMaterials[1];
@@ -196,8 +191,8 @@ public class Workbench extends Block{
     private int[] getSelectedIndecies() {
         Rectangle mouse = new Rectangle(Mouse.getX(), Mouse.getY(), 3, 3);
         
-        for (int y = 0; y < Sidecraft.player.getInventory().getContents()[0].length; y++) {
-            for (int x = 0; x < Sidecraft.player.getInventory().getContents().length; x++) {
+        for (int y = 0; y < Main.getGame().player.getInventory().getContents()[0].length; y++) {
+            for (int x = 0; x < Main.getGame().player.getInventory().getContents().length; x++) {
                 Rectangle box = new Rectangle(this.x + X_DIFF + (38 * x), this.y + Y_DIFF - (37 * y), 30, 30);
                 if (mouse.intersects(box)) {
                     return new int[] { x, y };

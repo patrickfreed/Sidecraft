@@ -1,45 +1,36 @@
 package com.freedsuniverse.sidecraft;
 
-import java.applet.AudioClip;
+import java.io.IOException;
+
+import org.newdawn.easyogg.OggClip;
+
+/*currently this class is just a wrapper until I find something useful to do with it*/
 
 public class Sound {
-    public static Sound blockDamage = new Sound("/audio/block_damage.wav"), 
-            blockBrea1k, 
-            sedimentWalk = new Sound("/audio/material/sedimentWalk.wav"), 
-            rockWalk = new Sound("/audio/material/sedimentWalk.wav");
+    public static Sound blockDamage = new Sound("/audio/material/sedimentWalk.ogg"), 
+            sedimentWalk = new Sound("/audio/material/sedimentWalk.ogg"), 
+            rockWalk = new Sound("/audio/material/sedimentWalk.ogg");
+   
+    private OggClip clip;
     
-    private AudioClip soundFile;
-    private String name;
-    
-    public Sound(String file){
-        name = file;
-        soundFile = Sidecraft.newAudioClip(Sound.class.getResource(file));
-    }
-    
-    public Sound(AudioClip sound) {
-        name = sound.toString();
-        soundFile = sound;
-    }
-    
-    public String getName(){
-        return name;
-    }
-    
-    public void play() {
-        if(!Settings.SOUND) return;
-        
+    public Sound(String file) {
         try {
-            new Thread() {
-                public void run() {
-                    soundFile.play();
-                }
-            }.start();
-        } catch (Throwable e) {
+            clip = new OggClip(Sidecraft.class.getResourceAsStream(file));
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
     
-    public void stop(){
-        soundFile.stop();
+    public Sound(OggClip sound) {
+        clip = sound;
+    }
+    
+    public void stop() {
+        clip.stop();
+    }
+    
+    public void play() {
+        if(clip.isPaused() || clip.stopped())
+            clip.play();
     }
 }

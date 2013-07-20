@@ -10,7 +10,7 @@ import com.freedsuniverse.sidecraft.world.Block;
 import com.freedsuniverse.sidecraft.world.Explosion;
 import com.freedsuniverse.sidecraft.world.Location;
 
-public class TNTPrimed implements Entity {
+public class TNTPrimed extends Entity {
 
     private Location location;
 

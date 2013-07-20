@@ -1,17 +1,13 @@
 package com.freedsuniverse.sidecraft;
 
-import java.applet.Applet;
+import java.awt.Canvas;
 import java.awt.Color;
-import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Image;
-import java.awt.Rectangle;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 
 import javax.imageio.ImageIO;
 
@@ -22,130 +18,124 @@ import com.freedsuniverse.sidecraft.input.Key;
 import com.freedsuniverse.sidecraft.input.Mouse;
 import com.freedsuniverse.sidecraft.material.CraftingRecipe;
 import com.freedsuniverse.sidecraft.material.Material;
-import com.freedsuniverse.sidecraft.screen.Button;
-import com.freedsuniverse.sidecraft.screen.Menu;
 import com.freedsuniverse.sidecraft.screen.Paused;
-import com.freedsuniverse.sidecraft.screen.Screen;
 import com.freedsuniverse.sidecraft.world.Location;
 import com.freedsuniverse.sidecraft.world.World;
 
-public class Sidecraft extends Applet implements Runnable{
+public class Sidecraft extends Canvas implements Runnable{
+    private final int SKY_COLOR = 220;
+    
     private static final long serialVersionUID = 1L;
     
-    public static int width, height;   
-
-    public final String newLine = System.getProperty("line.separator");
+    public int width, height;   
     
-    public static Player player;
+    public Player player;
+    
+    public static Location playerLoc;
     
     private int frames, lastFps;
 
-    public static long now, lastTime;
+    public long now, lastTime;
     
-    public static Rectangle window;
+    public Sound music;
     
-    public static Sound music;
+    private boolean isRunning = false, isPaused = true, hasStarted = false;
     
-    public static boolean isRunning = false, isPaused = true, hasStarted = false;
-
-    public static Image stoneTile2;
-    public static BufferedImage selectionTile, toolbarTile, inventoryTile, playerTile, toolbarSelectionTile, workbenchTile;
-    
-    public static LinkedList<BufferedImage> textures;
-    
-    public static HashMap<String, World> worlds = new HashMap<String, World>();
-
-    public static Screen currentScreen;
+    public HashMap<String, World> worlds = new HashMap<String, World>();
     
     private Image dbImage;
     private Graphics dbg;
     
-    public void init(){
-        width = this.getWidth();
-        height = this.getHeight();       
-        window = new Rectangle(0, 0, width, height);
+    public Sidecraft() {
+        width = 800;
+        height = 400;
+        this.setBounds(0, 0, width, height);      
         
-        Button.DEFAULT_TILE = getImage("/misc/menu/buttonTile.png");
+        isPaused = false;
         
-        textures = new LinkedList<BufferedImage>();
-        music = new Sound("/audio/music.wav");
-
-        currentScreen = new Menu();
-        currentScreen.show();
-        setBackground(Color.blue);
-            
+        setBackground(Color.DARK_GRAY);           
         InputListener i = new InputListener();
         this.addKeyListener(i);
         this.addMouseListener(i);
         this.addMouseMotionListener(i);
-        this.addMouseWheelListener(i);    
+        this.addMouseWheelListener(i);   
+        this.requestFocus();
     }
     
+    public void load(String name, ArrayList<World> ws, Player p) {
+        this.setName(name);
+        
+        for(World w:ws) {
+            this.worlds.put(w.getName(), w);
+        }
+        player = p;     
+        update();
+        
+        hasStarted = true;
+    }   
+    
     public void start() {
+        this.requestFocus();
         Engine.graphics = getGraphics();
-        isRunning = true;
-        loadTextures();              
+        isRunning = true;         
         Thread th = new Thread(this);
         lastTime = 0;
         CraftingRecipe.recipes.add(new CraftingRecipe(new int[]{2, 2, -1, -1, -1, -1, -1, -1, -1}, Material.IRON_ORE, 16));
         th.start();
     }
 
-    public void startNewGame() {                        
-        music.play();
+    public void startNewGame(String name) {                        
+        setName(name);
+        
+        //music.play();        
+        
+        World world = new World(name);
+        world.generateWorld();
+        worlds.put(world.getName(), world);    
         
         player = new Player();
-
-        World world = new World("world");
-        worlds.put(world.getName(), world);
+        player.load(name);
         player.world = world.getName();
+        playerLoc = player.getLocation();
+        hasStarted = true;       
         
         update();
     }
 
     public void update() {
         if(hasStarted && !this.hasFocus()){
-            isPaused = true;
-            currentScreen = new Paused();
-            currentScreen.show();
+            //pause();
         }
         
-        if(Key.ESCAPE.toggled() && hasStarted) pause();
+        if(Key.ESCAPE.toggled()) pause();
         
         updateKeys();
         Mouse.update();
-        if(isPaused){
-            if(currentScreen != null){
-                currentScreen.update();
-            }
-        }else{
-            if(!hasStarted){
-                hasStarted = true;
-                startNewGame();
-            }            
-            
+        if(!isPaused){                       
             if (Key.F5.toggled()) Settings.DEBUG = !Settings.DEBUG;
-            now = System.currentTimeMillis();
-            frames++;
             
-            if(now - lastTime > 1000){
-                System.out.println(frames + " fps");
-                lastFps = frames;
-                frames = 0;
-                lastTime = now;
-            }
-            player.getLocation().getWorld().update();
-            player.update();     
+            player.update();
+            player.getLocation().getWorld().update();   
+        }
+        
+        now = System.currentTimeMillis();
+        frames++;
+        
+        if(now - lastTime > 1000){
+            lastFps = frames;
+            frames = 0;
+            lastTime = now;
         }
     }
 
-    private void pause(){
+    public void pause() {         
         if(isPaused){
-            currentScreen.hide();
             isPaused = false;
+            Main.setScreen(Sidecraft.class.getName());    
+            this.requestFocus();
         }else {
-            currentScreen = new Paused();
-            currentScreen.show();
+            Key.releaseAll();
+            Main.setScreen(Paused.class.getName());
             isPaused = true;
         }
     }
@@ -167,18 +157,14 @@ public class Sidecraft extends Applet implements Runnable{
         Key.ESCAPE.update();
     }
     
+    @Override
     public void paint(Graphics g) {     
-        Engine.graphics = g;       
-        
+        Engine.graphics = g;           
         if(hasStarted){
             player.getLocation().getWorld().draw();
             player.draw();
             Engine.drawQueue();
-            drawMisc();   
-        }
-        
-        if(currentScreen != null && currentScreen.isVisible()){
-            currentScreen.draw();
+            drawMisc(); 
         }
     }
 
@@ -187,42 +173,40 @@ public class Sidecraft extends Applet implements Runnable{
         if (Settings.DEBUG) {            
             Engine.renderString(player.getLocation().toString(), 0, 25, Color.white);
             Engine.renderString(String.valueOf(lastFps + " fps"), 0, 35, Color.white);
+            Engine.renderString(Location.valueOf(Mouse.getPoint()).toString(), 0, 45, Color.white);
             Engine.renderString("0", new Location(0.5, -1), Color.white);
         }
     }
-    
-    private void loadTextures() {
-        int length = 13;
-  
-        for(int x = 0; x < length; x++){
-            textures.add(getImage("/material/" + x + ".png"));
-        }
-
-        toolbarSelectionTile = getImage("/misc/toolbar_selection.png");
-        playerTile = getImage("/player/texture/steve.png");
-        toolbarTile = getImage("/misc/toolbar.png");
-        selectionTile = getImage("/misc/selection.png");
-        inventoryTile = getImage("/misc/inventory.png");
-        workbenchTile = getImage("/misc/workbench_interior.png");
-    }
-    
+        
     public void stop(){
+        isPaused = false;
         isRunning = false;
     }
     
-    public void update(Graphics g){
+    public void update(Graphics graphics){        
         if (dbImage == null){
             dbImage = createImage (this.getSize().width, this.getSize().height);
             dbg = dbImage.getGraphics ();
         }
-
+        
         dbg.setColor (getBackground ());
-        dbg.fillRect (0, 0, this.getSize().width, this.getSize().height);
+       
+        int y = 0;
+        double increment = Double.valueOf(SKY_COLOR) / this.getHeight();
+        double color = 0;
+        do {
+            Color c = new Color((int)color, (int)color, 255);
+            dbg.setColor(c);
+            dbg.fillRect (0, y, this.getSize().width, 1);
+            if(color < SKY_COLOR) {
+                color += increment;
+            }
+            y++;
+        }while(y < this.getHeight());                       
 
-        dbg.setColor (getForeground());
         paint (dbg);
         
-        g.drawImage (dbImage, 0, 0, this);
+        graphics.drawImage (dbImage, 0, 0, this);
     }
     
     public void run() {  
@@ -242,28 +226,6 @@ public class Sidecraft extends Applet implements Runnable{
         return lastFps;
     }
     
-    public static void main(String[] args) {
-        final Frame mainFrame = new Frame();
-        mainFrame.setSize(800, 400);
-        final Sidecraft sideCraft = new Sidecraft();
-        
-        mainFrame.add(sideCraft);
-        mainFrame.setVisible(true);
-        mainFrame.addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent event) {
-                mainFrame.dispose();
-            }
-            public void windowClosed(WindowEvent event) {
-                sideCraft.stop();
-                System.exit(0);
-            }
-        });
-        mainFrame.setTitle("Sidecraft " + Settings.VERSION);
-        mainFrame.setResizable(false);
-        sideCraft.init();
-        sideCraft.start();
-    }
-
     public static BufferedImage getImage(String file) {
         try {
             return ImageIO.read(Sidecraft.class.getResourceAsStream(file));
@@ -271,4 +233,9 @@ public class Sidecraft extends Applet implements Runnable{
             return null;
         }
     }
+
+    public boolean isPaused() {
+        return isPaused;
+    }
+
 }

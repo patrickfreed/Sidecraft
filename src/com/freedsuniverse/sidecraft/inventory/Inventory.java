@@ -1,38 +1,41 @@
 package com.freedsuniverse.sidecraft.inventory;
 
-import com.freedsuniverse.sidecraft.material.Material;
+import com.freedsuniverse.sidecraft.material.Item;
 import com.freedsuniverse.sidecraft.material.MaterialStack;
+import com.freedsuniverse.sidecraft.material.tools.Pickaxe;
+import com.freedsuniverse.sidecraft.material.tools.Quality;
 
 public class Inventory {
-    private MaterialStack[][] contents;
+    private Item[][] contents;
     
-    final int COLUMNS = 5;
-    final int ROWS = 4;
+    public final static int COLUMNS = 5;
+    public final static int ROWS = 4;
     
     public Inventory() {
-        contents = new MaterialStack[COLUMNS][ROWS];
-        contents[0][0] = new MaterialStack(Material.WORKBENCH, 5);
-        contents[4][0] = new MaterialStack(Material.TNT, 10);
+        contents = new Item[COLUMNS][ROWS];
+        contents[0][0] = new Pickaxe(Quality.STONE);
+        contents[1][0] = new Pickaxe(Quality.IRON);
+        contents[2][0] = new Pickaxe(Quality.SILVER);
     }
     
-    public void add(MaterialStack stack) {
+    public void add(Item type) {
         for(int y = 0; y < contents[0].length; y++){
             for (int x = 0; x < contents.length; x++) {
                 if (contents[x][y] != null) {
-                    if (contents[x][y].getType() == stack.getType()) {
+                    if (contents[x][y].getType() == type.getType()) {
                         if (contents[x][y].getAmount() < contents[x][y].getType().getMaxStackSize()) {
                             int amount = contents[x][y].getType().getMaxStackSize() - contents[x][y].getAmount();
 
-                            if (amount > stack.getAmount()) {
-                                contents[x][ y].modifyAmount(stack.getAmount());
-                                stack.modifyAmount(-1 * stack.getAmount());
+                            if (amount > type.getAmount()) {
+                                contents[x][y].modifyAmount(type.getAmount());
+                                type.modifyAmount(-1 * type.getAmount());
                             }
                             else {
-                                contents[x][ y].modifyAmount(amount);
-                                stack.modifyAmount(-1 * amount);
+                                contents[x][y].setAmount(amount);
+                                type.modifyAmount(-1 * amount);
                             }
 
-                            if (stack.getAmount() == 0) {
+                            if (type.getAmount() == 0) {
                                 return;
                             }
                         }
@@ -41,11 +44,11 @@ public class Inventory {
             }
         }
 
-        if (stack.getAmount() > 0) {
+        if (type.getAmount() > 0) {
             for (int y = 0; y < contents.length; y++) {
                 for (int x = 0; x < contents[0].length; x++) {
                     if (contents[x][ y]  == null) {
-                        setAt(x, y, stack);
+                        setAt(x, y, type);
                         return;
                     }
                 }
@@ -53,17 +56,17 @@ public class Inventory {
         }
     }
 
-    public MaterialStack getAt(int column, int row) {
+    public Item getAt(int column, int row) {
         return getContents()[column][ row];
     }
 
-    public void setAt(int column, int row, MaterialStack stack) {
+    public void setAt(int column, int row, Item handled) {
         if (column < contents.length && row < contents[0].length && row > -1 && column > -1) {
-            contents[column][ row] = stack;
+            contents[column][ row] = handled;
         }
     }
 
-    public MaterialStack[][] getContents() {
+    public Item[][] getContents() {
         return this.contents;
     }
 

@@ -24,8 +24,11 @@ public class FlatNoiseGen {
 	public Random pRnd = new Random();
 
 	public FlatNoiseGen(){
-	    seed = new Random().nextInt(10000000 - 1000000) + 1000000;
-	    
+	    this(new Random().nextInt(10000000 - 1000000) + 1000000); 
+	}
+	
+	public FlatNoiseGen(int s) {
+	    this.seed = s;
 	}
 	
 	public double noise(int x, int y) {
@@ -35,7 +38,7 @@ public class FlatNoiseGen {
 	public Material getBlock(World world, int x, int y) {
 		Material block = getRawBlock(x, y);
 		// population: ores
-		if (block == STONE) {
+		if (block == STONE && false) {
 			int oreAround = world.oreAmountAround(x, y);
 			if (oreAround == 4 || (oreAround > 0 && pRnd.nextInt(4) < oreAround) || pRnd.nextInt(64) == 0) {
 				block = getRandomOreMaterial();

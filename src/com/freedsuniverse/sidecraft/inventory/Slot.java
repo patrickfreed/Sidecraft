@@ -2,10 +2,12 @@ package com.freedsuniverse.sidecraft.inventory;
 
 import java.awt.Rectangle;
 
+import com.freedsuniverse.sidecraft.material.Item;
 import com.freedsuniverse.sidecraft.material.MaterialStack;
 
+
 public class Slot {
-    private MaterialStack content;
+    private Item content;
     private Rectangle box;
     
     public Slot(MaterialStack stack, Rectangle box){
@@ -13,12 +15,12 @@ public class Slot {
         this.box = box;
     }
     
-    public MaterialStack getContent(){
+    public Item getContent(){
         return content;
     }
     
-    public void setContent(MaterialStack m){
-        content = m;
+    public void setContent(Item outcome){
+        content = outcome;
     }
     
     public Rectangle getBounds(){

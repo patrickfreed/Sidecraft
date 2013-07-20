@@ -1,51 +1,43 @@
 package com.freedsuniverse.sidecraft.screen;
 
-import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
+import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-import com.freedsuniverse.sidecraft.Settings;
-import com.freedsuniverse.sidecraft.Sidecraft;
-import com.freedsuniverse.sidecraft.engine.Engine;
-import com.freedsuniverse.sidecraft.input.Mouse;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.SpringLayout;
 
-public class Menu extends Screen{   
-    private BufferedImage background;   
-    
-    private Button start, settings;
+import com.freedsuniverse.sidecraft.Main;
 
-    public Menu(){
-        start = new Button("Play game", Button.DEFAULT_TILE, Sidecraft.width / 2 - 32 * 4, Sidecraft.height / 2 + 16, 32*8, 32);
-        settings = new Button("Settings", Button.DEFAULT_TILE, Sidecraft.width / 2 - 32 * 4, Sidecraft.height / 2 + 54, 32*8, 32);
-        super.setVisible(false);
-        background = Sidecraft.getImage(Settings.MENU_BACKGROUND);
-        super.setBackgroundTile(Sidecraft.getImage(Settings.MENU_BACKGROUND_TILE));
-    }
-    
-    @Override
-    public void update() {
-        if(isVisible()){
-            if(Mouse.clicked(MouseEvent.BUTTON1)){
-                if(start.getBounds().contains(Mouse.getPoint())){
-                    hide();
-                }else if(settings.getBounds().contains(Mouse.getPoint())){
-                    Sidecraft.currentScreen = new SettingsMenu(this);
-                }
+public class Menu extends Screen {
+    private static final long serialVersionUID = 1L;
+
+    public Menu() {
+        setBackground(Color.LIGHT_GRAY);
+        SpringLayout springLayout = new SpringLayout();
+        setLayout(springLayout);
+        
+        JButton startGame = new JButton("Start Game");
+        springLayout.putConstraint(SpringLayout.SOUTH, startGame, -149, SpringLayout.SOUTH, this);
+        startGame.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                Main.setScreen(SaveLoader.class.getName());
             }
-        } 
-    }
-    
-    @Override
-    public void draw() {
-        if(isVisible()){
-            for(int x = 0; x < (Sidecraft.width / 32) + 1; x++){
-                for(int y = 0; y < (Sidecraft.height / 32) + 1; y++){
-                    Engine.render(x * 32, y * 32, getBackgroundTile());
-                }
-            }
-            Engine.render(Sidecraft.width / 2 - background.getWidth() / 2, 50, background);
-            
-            start.draw();
-            settings.draw();
-        }
-    }
+        });
+        add(startGame);
+        
+        JLabel label = new JLabel("");
+        springLayout.putConstraint(SpringLayout.WEST, startGame, 150, SpringLayout.WEST, label);
+        springLayout.putConstraint(SpringLayout.EAST, startGame, -150, SpringLayout.EAST, label);
+        springLayout.putConstraint(SpringLayout.NORTH, label, 10, SpringLayout.NORTH, this);
+        springLayout.putConstraint(SpringLayout.WEST, label, 167, SpringLayout.WEST, this);
+        springLayout.putConstraint(SpringLayout.SOUTH, label, 141, SpringLayout.NORTH, this);
+        springLayout.putConstraint(SpringLayout.EAST, label, -162, SpringLayout.EAST, this);
+        label.setMaximumSize(label.getSize());
+        label.setMinimumSize(label.getSize());
+        label.setIcon(new ImageIcon(Menu.class.getResource("/misc/menu/background.png")));
+        add(label);
+    } 
 }

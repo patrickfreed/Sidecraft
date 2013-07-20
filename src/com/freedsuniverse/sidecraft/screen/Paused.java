@@ -1,48 +1,73 @@
 package com.freedsuniverse.sidecraft.screen;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Rectangle;
-import java.awt.event.MouseEvent;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-import com.freedsuniverse.sidecraft.Settings;
-import com.freedsuniverse.sidecraft.Sidecraft;
-import com.freedsuniverse.sidecraft.engine.Engine;
-import com.freedsuniverse.sidecraft.input.Mouse;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SpringLayout;
+import javax.swing.SwingConstants;
 
-public class Paused extends Screen{    
-    private Button resume, settings;
+import com.freedsuniverse.sidecraft.Main;
 
-    public Paused(){
-        resume = new Button("Resume", Button.DEFAULT_TILE, new Rectangle(Sidecraft.width / 2 - 32 * 4, Sidecraft.height / 2 + 16, 32*8, 32));
-        settings = new Button("Settings", Button.DEFAULT_TILE, new Rectangle(Sidecraft.width / 2 - 32 * 4, Sidecraft.height / 2 + 54, 32*8, 32));
-        setVisible(false);
-        setBackgroundTile(Sidecraft.getImage((Settings.PAUSED_BACKGROUND)));
+public class Paused extends JPanel {
+    private static final long serialVersionUID = 1L;
+    
+    public Paused() {      
+        setOpaque(true);
+        setLayout(new BorderLayout(0, 0));
+        
+        Color toUse = Color.gray;
+        setBackground(new Color(toUse.getRed(), toUse.getBlue(), toUse.getGreen(), 150));
+        
+        JPanel panel = new JPanel();
+        panel.setOpaque(false);
+        add(panel, BorderLayout.CENTER);
+        SpringLayout sl_panel = new SpringLayout();
+        panel.setLayout(sl_panel);
+        
+        JButton btnSaveAndQuit = new JButton("Save and Quit");
+        sl_panel.putConstraint(SpringLayout.NORTH, btnSaveAndQuit, 153, SpringLayout.NORTH, panel);
+        sl_panel.putConstraint(SpringLayout.WEST, btnSaveAndQuit, 300, SpringLayout.WEST, panel);
+        sl_panel.putConstraint(SpringLayout.EAST, btnSaveAndQuit, -300, SpringLayout.EAST, panel);
+        panel.add(btnSaveAndQuit);
+        btnSaveAndQuit.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                //Main.saveGame(Main.getGame().getName());
+                Main.getGame().stop();
+                Main.setScreen(Menu.class.getName());               
+            }
+        });
+        
+        JButton btnResume = new JButton("Resume");
+        sl_panel.putConstraint(SpringLayout.WEST, btnResume, 0, SpringLayout.WEST, btnSaveAndQuit);
+        sl_panel.putConstraint(SpringLayout.NORTH, btnResume, 10, SpringLayout.SOUTH, btnSaveAndQuit);
+        sl_panel.putConstraint(SpringLayout.EAST, btnResume, 0, SpringLayout.EAST, btnSaveAndQuit);
+        panel.add(btnResume);
+        
+        JLabel lblPaused = new JLabel("PAUSED");
+        sl_panel.putConstraint(SpringLayout.WEST, lblPaused, 0, SpringLayout.WEST, btnResume);
+        sl_panel.putConstraint(SpringLayout.EAST, lblPaused, 0, SpringLayout.EAST, btnResume);
+        sl_panel.putConstraint(SpringLayout.NORTH, lblPaused, 20, SpringLayout.NORTH, panel);
+        panel.add(lblPaused);
+        lblPaused.setHorizontalAlignment(SwingConstants.CENTER);
+        lblPaused.setFont(new Font("Quartz MS", Font.PLAIN, 27));
+        btnResume.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                Main.getGame().pause();
+            }
+        });
+    }   
+    
+    public void paintComponent(Graphics g) {
+        Main.getGame().update(g);
+        Main.getGame().paint(g);
+        super.paintComponent(g);
     }
     
-    @Override
-    public void update() {
-        if(isVisible()){
-            if(Mouse.clicked(MouseEvent.BUTTON1)){
-                if(resume.getBounds().contains(Mouse.getPoint())){
-                    hide();
-                }else if(settings.getBounds().contains(Mouse.getPoint())){
-                    Sidecraft.currentScreen = new SettingsMenu(this);
-                }
-            }
-        } 
-    }
-
-    @Override
-    public void draw() {
-        if(isVisible()){           
-            for(int x = 0; x < (Sidecraft.width / 32) + 1; x++){
-                for(int y = 0; y < (Sidecraft.height / 32) + 1; y++){
-                    Engine.render(x * 32, y * 32, getBackgroundTile());
-                }
-            }
-            Engine.renderString("Paused", Sidecraft.width / 2 - "Paused".length() * 3, 100, Color.white);
-            resume.draw();
-            settings.draw();
-        }
-    }
 }

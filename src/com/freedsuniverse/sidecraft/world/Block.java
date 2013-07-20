@@ -1,50 +1,40 @@
 package com.freedsuniverse.sidecraft.world;
 
-import java.awt.Graphics;
 import java.awt.Rectangle;
 
-import com.freedsuniverse.sidecraft.Settings;
 import com.freedsuniverse.sidecraft.Sound;
 import com.freedsuniverse.sidecraft.engine.Engine;
 import com.freedsuniverse.sidecraft.entity.DropEntity;
 import com.freedsuniverse.sidecraft.entity.Entity;
+import com.freedsuniverse.sidecraft.entity.LightSource;
 import com.freedsuniverse.sidecraft.entity.TNTPrimed;
 import com.freedsuniverse.sidecraft.material.Material;
 
-public class Block implements Entity{
-    private Location location;
-
-    private int health;
-    
-    
+public class Block extends Entity{     
+    public static final int TYPE = 0, X = 1, Y = 2, WORLD = 3;
     
     private Material data;
+    protected LightSource s;
+    private int health;
 
     public Block(Material d) {
         this.data = d;
-        this.health = data.getDurability();
-    }
+        health = data.getDurability();       
+    }    
 
     public void interact(Entity e){
-    }
-    
-    public void update(){       
-    }
+    }   
     
     public int getTypeId() {
         return this.data.getId();
     }
 
+    public void update() {
+        super.update();
+    }
+    
     public Material getType() {
         return this.data;
-    }
-
-    public Location getLocation() {
-        return this.location;
-    }
-
-    public void setLocation(Location newc) {
-        this.location = newc;
     }
 
     public void setType(Material dataToSet) {
@@ -52,16 +42,12 @@ public class Block implements Entity{
         this.health = dataToSet.getDurability();
     }
 
-    public void draw(){
-        Engine.render(getBounds().x, getBounds().y, getType().getImage());
+    public Rectangle getBounds() {
+        return getLocation().toRectangle(this.data.getImage().getWidth(), this.data.getImage().getHeight()); 
     }
     
-    public void draw(Graphics g) {
-        g.drawImage(getType().getImage(), Settings.BLOCK_SIZE, Settings.BLOCK_SIZE, null);
-    }
-
-    public int getHealth() {
-        return health;
+    public void draw(){
+        Engine.render(getBounds().x, getBounds().y, getType().getImage());
     }
 
     public void damage(int d) {
@@ -73,10 +59,6 @@ public class Block implements Entity{
         }
     }
 
-    public Rectangle getBounds() {
-        return location.toRectangle(32, 32);
-    }
-
     public void destroy(){
         Sound.blockDamage.play();
         
@@ -85,12 +67,19 @@ public class Block implements Entity{
 
         //TODO: Move this to a better place
         if (material == Material.TNT) {
-            new TNTPrimed(location, 100, 5).spawn();
+            new TNTPrimed(getLocation(), 100, 5).spawn();
             return;
         }
 
         for (int x = 0; x < material.getDropAmount(); x++) {
-            new DropEntity(material.getDropType(), new Location(location.getX() + 0.6 * x, location.getY())).spawn();
+            new DropEntity(material.getDropType(), new Location(getLocation().getX() + 0.6 * x, getLocation().getY())).spawn();
         }
+    }
+    
+    public String toString() {
+        String s = "";
+        s += getType();
+        s += ":" + this.getLocation();
+        return s;
     }
 }

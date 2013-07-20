@@ -9,8 +9,10 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
 public class InputListener implements KeyListener, MouseListener, MouseMotionListener, MouseWheelListener{
+    public static InputListener i = new InputListener();
+    
     @Override
-    public void mouseClicked(MouseEvent arg0) {      
+    public void mouseClicked(MouseEvent arg0) {              
     }
 
     @Override

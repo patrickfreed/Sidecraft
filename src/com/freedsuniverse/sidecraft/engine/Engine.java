@@ -35,6 +35,9 @@ public class Engine {
         render(rec, img);
     }
     
+    public static void render(Location loc, BufferedImage img) {
+        render(loc.toRectangle(img.getWidth(), img.getHeight()), img);
+    }
     public static void render(int x, int y, BufferedImage img){
         graphics.drawImage(img, x, y, null);
     }

@@ -2,6 +2,7 @@ package com.freedsuniverse.sidecraft.material;
 
 import java.util.LinkedList;
 
+
 public class CraftingRecipe {
     public static LinkedList<CraftingRecipe> recipes = new LinkedList<CraftingRecipe>();
     

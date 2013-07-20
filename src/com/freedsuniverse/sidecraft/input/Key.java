@@ -6,6 +6,23 @@ public class Key {
     
     boolean down, old, current;
     
+    public static void releaseAll() {
+        W.toggle(false);
+        A.toggle(false);
+        S.toggle(false);
+        D.toggle(false);
+        B.toggle(false);
+        F5.toggle(false);
+        SPACE.toggle(false);
+        I.toggle(false);
+        ONE.toggle(false);
+        TWO.toggle(false);
+        THREE.toggle(false);
+        FOUR.toggle(false);
+        FIVE.toggle(false);
+        ESCAPE.toggle(false);
+    }
+    
     public Key(){
         down = false;
         old = false;
@@ -24,7 +41,7 @@ public class Key {
     }
     
     public boolean toggled(){
-        return old == false && current == true;
+        return !old && current;
     }
     
     public boolean isDown(){
