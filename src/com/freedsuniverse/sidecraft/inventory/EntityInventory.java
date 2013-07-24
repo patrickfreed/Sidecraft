@@ -10,7 +10,6 @@ import com.freedsuniverse.sidecraft.engine.Engine;
 import com.freedsuniverse.sidecraft.engine.RenderQueueItem;
 import com.freedsuniverse.sidecraft.entity.DropEntity;
 import com.freedsuniverse.sidecraft.entity.Entity;
-import com.freedsuniverse.sidecraft.entity.LivingEntity;
 import com.freedsuniverse.sidecraft.input.Mouse;
 import com.freedsuniverse.sidecraft.material.CraftingRecipe;
 import com.freedsuniverse.sidecraft.material.Item;

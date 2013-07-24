@@ -48,6 +48,7 @@ public class Block extends Entity{
     
     public void draw(){
         Engine.render(getBounds().x, getBounds().y, getType().getImage());
+        drawLighting();
     }
 
     public void damage(int d) {

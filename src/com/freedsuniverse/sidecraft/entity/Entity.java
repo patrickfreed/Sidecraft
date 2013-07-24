@@ -19,14 +19,30 @@ public class Entity{
         l = new Light();
     }
     
-    public void update() {    
-        l.setColor(null);
+    public void update() {
     }
 
     public void draw() {
         Engine.render(loc, getSkin());
     }
 
+    public void drawLighting() {
+        Color ls = l.getColor();
+        Color c3 = null;
+        
+        if(ls == null) {
+            c3 = Color.black;  
+            System.out.println("whhhhhy");
+        }else {
+            c3 = new Color((ls.getRed() + Light.DARK.getRed()) / 2, (ls.getGreen() + Light.DARK.getGreen()) / 2, (ls.getBlue() + Light.DARK.getBlue()) / 2, 255 - ls.getAlpha());
+        }
+        Rectangle r1 = getBounds();
+
+        Engine.graphics.setColor(c3);
+        Engine.graphics.fillRect(r1.x, r1.y, r1.width, r1.height);
+        l.setColor(null);
+    }
+    
     public void destroy() {
         loc.getWorld().unregisterEntity(this);
     }
@@ -68,6 +84,10 @@ public class Entity{
     }
     
     public void light(Color c) {
+        if(c == null) {
+            System.err.println("alert alert alert");
+        }
+        
         if(l.getColor() == null) {
             l.setColor(c);
         }else {

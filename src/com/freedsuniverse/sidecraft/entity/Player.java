@@ -1,6 +1,5 @@
 package com.freedsuniverse.sidecraft.entity;
 
-import java.awt.Color;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
@@ -207,7 +206,7 @@ public class Player extends Entity{
                         return;
                     } 
                     
-                    System.out.println(block.getLight().getColor());
+                    //System.out.println(block.getLight().getColor().getAlpha());
                     attack(getWorld().getBlockAt(mouseCoords));
                  }
             }

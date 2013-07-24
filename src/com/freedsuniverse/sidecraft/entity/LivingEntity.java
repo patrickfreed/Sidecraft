@@ -30,7 +30,7 @@ public class LivingEntity extends Entity{
     private double spaceMoved = 0;   
     private boolean blocked = false, damaged = false;
     private long dmg = -1;
-    private BufferedImage red;
+
     
     public LivingEntity(String id, int w, int h, int health) {
         anime = new Animation(Animation.read("/entity/" + id + ".png", w, h), 10);

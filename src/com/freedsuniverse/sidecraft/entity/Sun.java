@@ -10,12 +10,13 @@ public class Sun extends LightSource {
     private final static long DAY_LENGTH = 10000;
     private final static Light[] stages = {new Light(MIDDAY), new Light(MIDDAY), new Light(MIDDAY), new Light(Color.yellow, 200), new Light(Color.orange, 200), new Light(Color.red, 200), 
         new Light(Color.darkGray, 150), new Light(Color.black, 100), new Light(Color.black, 100), new Light(Color.black, 100), new Light(Color.darkGray, 150), new Light(Color.orange, 200)}; 
+    private final int RADIUS = 15;
     
     private long time, lasttime;
     private int day, stage, increase;
     
     public Sun() {
-        super(MIDDAY, 255, 25);
+        super(MIDDAY, 255, 10);
         time = 0;
         lasttime = System.currentTimeMillis();
         day = 1;
@@ -23,8 +24,12 @@ public class Sun extends LightSource {
         increase = (int) (DAY_LENGTH / stages.length);
     }
     
+    @Override
+    public void draw() {
+    }
+    
     public void update() {
-        setLocation(Sidecraft.playerLoc.modify(0, 10));
+        setLocation(Sidecraft.playerLoc);
         
         time += System.currentTimeMillis() - lasttime;
         lasttime = System.currentTimeMillis();
@@ -38,7 +43,7 @@ public class Sun extends LightSource {
             time = 0;
             System.out.println("Day " + day);
         }else if(stage != oldstage) {
-            setLight(stages[stage], 25);
+            setLight(stages[stage], RADIUS);
             getLocation().getWorld().lightUpdate();
         }
         

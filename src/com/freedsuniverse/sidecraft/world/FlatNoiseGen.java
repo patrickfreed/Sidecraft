@@ -35,7 +35,8 @@ public class FlatNoiseGen {
 		return Noise.GradientCoherentNoise3D(x/(scale*2), y/scale, 0, seed, NoiseQuality.BEST);
 	}
 
-	public Material getBlock(World world, int x, int y) {
+	@SuppressWarnings("unused")
+    public Material getBlock(World world, int x, int y) {
 		Material block = getRawBlock(x, y);
 		// population: ores
 		if (block == STONE && false) {

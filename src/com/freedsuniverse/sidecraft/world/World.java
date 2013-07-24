@@ -1,9 +1,5 @@
 package com.freedsuniverse.sidecraft.world;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Rectangle;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -13,11 +9,8 @@ import java.util.Iterator;
 import com.freedsuniverse.sidecraft.Main;
 import com.freedsuniverse.sidecraft.Settings;
 import com.freedsuniverse.sidecraft.Sidecraft;
-import com.freedsuniverse.sidecraft.engine.Engine;
-import com.freedsuniverse.sidecraft.engine.Light;
 import com.freedsuniverse.sidecraft.entity.Entity;
 import com.freedsuniverse.sidecraft.entity.Sun;
-import com.freedsuniverse.sidecraft.entity.animal.Pig;
 import com.freedsuniverse.sidecraft.input.Key;
 import com.freedsuniverse.sidecraft.material.Material;
 
@@ -30,9 +23,8 @@ public class World {
     private HashMap<String, Block> blocks;
     private HashMap<String, ArrayList<Entity>> es;
     private int nextId;
-    private boolean uLight;
-    private BufferedImage lighting;
-
+    private boolean u;
+    
     public static World load(File f) throws IOException {
 //        //requirements
 //        String worldName = "";
@@ -90,6 +82,7 @@ public class World {
         this.blocks = blocks;
         this.gen = g;
         this.nextId = -1;
+        this.u = false;
         Sun s = new Sun();
         s.setLocation(new Location(0, 0, this.name));
         registerEntity(s);
@@ -146,7 +139,6 @@ public class World {
     }
 
     public void lightUpdate() {
-        uLight = true;
     }
     
     private boolean isOre(Material mat) {
@@ -155,7 +147,8 @@ public class World {
 
     public void update() {
         if(Key.B.toggled()) {
-            new Pig().spawn(Main.getGame().player.getLocation().modify(1, 0));
+            //new Pig().spawn(Main.getGame().player.getLocation().modify(1, 0));
+            u = !u;
         }
         
         updateBlocks();
@@ -163,11 +156,11 @@ public class World {
     }
 
     private void updateBlocks() {
-        if(!Main.getGame().player.getLocation().getWorld().getName().equals(this.getName())) return;
+        if(!Sidecraft.playerLoc.getWorld().getName().equals(this.getName())) return;
 
         for(int x = 0; x < 32; x++) {
             for(int y = 0; y < 32; y++) {
-                getBlockAt((int) (Main.getGame().player.getLocation().getX() - 16) + x, (int) (Main.getGame().player.getLocation().getY() - 16) + y).update();
+                getBlockAt((int) (Sidecraft.playerLoc.getX() - 16) + x, (int) (Sidecraft.playerLoc.getY() - 16) + y).update();
             }
         }
         
@@ -188,10 +181,10 @@ public class World {
         
         for(String s:es.keySet()) {
             for(int x = 0; x < es.get(s).size(); x++) {
-                Entity e = es.get(s).get(x);
+                Entity e = es.get(s).get(x);             
+                if(e instanceof Block) System.err.println("alert 2");
                 e.update();
-                if(!e.getLocation().getId().equals(s)) {
-                    //System.out.println("changed from " + s + " to " + e.getLocation().getId());
+                if(!e.getLocation().getId().equals(s)) {   
                     changed.add(e);
                     es.get(s).remove(x);
                 }
@@ -209,11 +202,11 @@ public class World {
     }
 
     public void draw() {             
-        Iterator<Block> i1 = blocks.values().iterator();
         Iterator<ArrayList<Entity>> i2 = es.values().iterator();
         
-        while(i1.hasNext()) {
-            Block b = i1.next();
+        ArrayList<Block> bs = getNearbyBlocks(Sidecraft.playerLoc, 15);
+        
+        for(Block b:bs) {
             b.draw();
         }
         
@@ -225,40 +218,6 @@ public class World {
                 }
             
         }
-        
-        if(uLight) {
-            drawLighting();
-            uLight = false;
-        }
-        Engine.render(0, 0, lighting);
-    }
-
-    private void drawLighting() {
-        BufferedImage i = new BufferedImage(Main.getPaneWidth(), Main.getPaneHeight(), BufferedImage.TYPE_INT_ARGB);
-        
-        int r = 25;
-        
-        ArrayList<Block> bs = getNearbyBlocks(Sidecraft.playerLoc, r);
-
-        Graphics g = i.getGraphics();
-        
-        for(Block b:bs) {
-            Light l = b.getLight();
-            Color ls = l.getColor();
-            Color c3 = null;
-            
-            if(ls == null) {
-                c3 = Color.black;
-            }else {
-                c3 = new Color((ls.getRed() + Light.DARK.getRed()) / 2, (ls.getGreen() + Light.DARK.getGreen()) / 2, (ls.getBlue() + Light.DARK.getBlue()) / 2, 255 - ls.getAlpha());
-            }
-            Rectangle r1 = b.getBounds();
-
-            g.setColor(c3);
-            g.fillRect(r1.x, r1.y, 32, 32);
-        }
-        
-        lighting = i;
     }
     
     public ArrayList<Entity> getNearbyEntities(Location l) {
