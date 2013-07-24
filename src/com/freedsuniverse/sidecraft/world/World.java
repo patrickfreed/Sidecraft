@@ -11,6 +11,7 @@ import com.freedsuniverse.sidecraft.Settings;
 import com.freedsuniverse.sidecraft.Sidecraft;
 import com.freedsuniverse.sidecraft.entity.Entity;
 import com.freedsuniverse.sidecraft.entity.Sun;
+import com.freedsuniverse.sidecraft.entity.animal.Pig;
 import com.freedsuniverse.sidecraft.input.Key;
 import com.freedsuniverse.sidecraft.material.Material;
 
@@ -23,7 +24,6 @@ public class World {
     private HashMap<String, Block> blocks;
     private HashMap<String, ArrayList<Entity>> es;
     private int nextId;
-    private boolean u;
     
     public static World load(File f) throws IOException {
 //        //requirements
@@ -82,7 +82,6 @@ public class World {
         this.blocks = blocks;
         this.gen = g;
         this.nextId = -1;
-        this.u = false;
         Sun s = new Sun();
         s.setLocation(new Location(0, 0, this.name));
         registerEntity(s);
@@ -147,8 +146,7 @@ public class World {
 
     public void update() {
         if(Key.B.toggled()) {
-            //new Pig().spawn(Main.getGame().player.getLocation().modify(1, 0));
-            u = !u;
+            new Pig().spawn(Main.getGame().player.getLocation().modify(1, 0));
         }
         
         updateBlocks();

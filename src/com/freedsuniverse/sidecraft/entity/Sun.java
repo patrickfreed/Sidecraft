@@ -10,13 +10,13 @@ public class Sun extends LightSource {
     private final static long DAY_LENGTH = 10000;
     private final static Light[] stages = {new Light(MIDDAY), new Light(MIDDAY), new Light(MIDDAY), new Light(Color.yellow, 200), new Light(Color.orange, 200), new Light(Color.red, 200), 
         new Light(Color.darkGray, 150), new Light(Color.black, 100), new Light(Color.black, 100), new Light(Color.black, 100), new Light(Color.darkGray, 150), new Light(Color.orange, 200)}; 
-    private final int RADIUS = 15;
+    private final static int RADIUS = 15;
     
     private long time, lasttime;
     private int day, stage, increase;
     
     public Sun() {
-        super(MIDDAY, 255, 10);
+        super(MIDDAY, 255, RADIUS);
         time = 0;
         lasttime = System.currentTimeMillis();
         day = 1;
