@@ -40,7 +40,9 @@ public class LightSource extends Entity{
         return i;
     }
     
-    public void update() {
+    public void update() {    
+        if(getLocation() == null) return;
+        
         ArrayList<Block> bs = getLocation().getWorld().getNearbyBlocks(getLocation(), radius);
         
         for(Block b:bs) { 

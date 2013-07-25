@@ -6,7 +6,6 @@ import com.freedsuniverse.sidecraft.Sound;
 import com.freedsuniverse.sidecraft.engine.Engine;
 import com.freedsuniverse.sidecraft.entity.DropEntity;
 import com.freedsuniverse.sidecraft.entity.Entity;
-import com.freedsuniverse.sidecraft.entity.LightSource;
 import com.freedsuniverse.sidecraft.entity.TNTPrimed;
 import com.freedsuniverse.sidecraft.material.Material;
 
@@ -14,12 +13,11 @@ public class Block extends Entity{
     public static final int TYPE = 0, X = 1, Y = 2, WORLD = 3;
     
     private Material data;
-    protected LightSource s;
     private int health;
 
     public Block(Material d) {
         this.data = d;
-        health = data.getDurability();       
+        health = data.getDurability();
     }    
 
     public void interact(Entity e){
@@ -63,18 +61,17 @@ public class Block extends Entity{
     public void destroy(){
         Sound.blockDamage.play();
         
-        Material material = this.getType();
-        setType(Material.AIR);
-
-        //TODO: Move this to a better place
-        if (material == Material.TNT) {
+        for (int x = 0; x < data.getDropAmount(); x++) {
+            new DropEntity(data.getDropType(), new Location(getLocation().getX() + 0.6 * x, getLocation().getY())).spawn();
+        }
+        
+      //TODO: Move this to a better place
+        if (data == Material.TNT) {
             new TNTPrimed(getLocation(), 100, 5).spawn();
             return;
         }
-
-        for (int x = 0; x < material.getDropAmount(); x++) {
-            new DropEntity(material.getDropType(), new Location(getLocation().getX() + 0.6 * x, getLocation().getY())).spawn();
-        }
+        
+        getLocation().getWorld().setBlockAt(getLocation(), new Block(Material.AIR));
     }
     
     public String toString() {

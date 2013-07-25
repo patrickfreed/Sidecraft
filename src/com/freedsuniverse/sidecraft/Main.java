@@ -82,7 +82,7 @@ public class Main extends Applet{
     }
 
     private static void loadTextures() {
-        int length = 14;
+        int length = 15;
   
         for(int x = 0; x < length; x++){
             textures.add(getImage("/material/" + x + ".png"));

@@ -7,7 +7,7 @@ import com.freedsuniverse.sidecraft.engine.Light;
 
 public class Sun extends LightSource {
     private final static Color MIDDAY = new Color(0, 0, 0, 255);
-    private final static long DAY_LENGTH = 10000;
+    private final static long DAY_LENGTH = 60000;
     private final static Light[] stages = {new Light(MIDDAY), new Light(MIDDAY), new Light(MIDDAY), new Light(Color.yellow, 200), new Light(Color.orange, 200), new Light(Color.red, 200), 
         new Light(Color.darkGray, 150), new Light(Color.black, 100), new Light(Color.black, 100), new Light(Color.black, 100), new Light(Color.darkGray, 150), new Light(Color.orange, 200)}; 
     private final static int RADIUS = 15;

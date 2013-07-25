@@ -96,7 +96,7 @@ public class Player extends Entity{
 
         toolbar = new Toolbar();
         inventory = inv;
-        inv.add(new MaterialStack(Material.GRASS, 64));
+        inv.add(new MaterialStack(Material.TORCH, 64));
 
         moveState = MovementState.WALKING;
         action = ActionState.IDLE;
@@ -217,7 +217,7 @@ public class Player extends Entity{
                 if (canPlaceBlock(block)) {
                     if(getToolbar().getSelectedObj().getType() == Material.WORKBENCH){                
                         getWorld().setBlockAt(block.getLocation(), new Workbench());
-                    }else if(getToolbar().getSelectedObj().getType() == Material.GRASS) {
+                    }else if(getToolbar().getSelectedObj().getType() == Material.TORCH) {
                         getWorld().setBlockAt(block.getLocation(), new Torch());
                     }else{       
                         block.setType(getToolbar().getSelectedObj().getType());

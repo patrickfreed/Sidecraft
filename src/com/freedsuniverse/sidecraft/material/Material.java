@@ -20,7 +20,8 @@ public enum Material{
     WATER(0, 0, 0, 0, 0, false),
     TNT(0, 1),
     WORKBENCH(12), 
-    PICKAXE(13);
+    PICKAXE(13),
+    TORCH(14, 1, false);
     
     public static final int LIQUID = 0, SEDIMENT = 1, ROCK = 2;
     
@@ -60,6 +61,10 @@ public enum Material{
     
     private Material(int drpType, int dur){
         this(drpType, dur, 64, 1, 1, true);
+    }
+    
+    private Material(int drpType, int dur, boolean solid) {
+        this(drpType, dur, 64, 1, 1, solid);
     }
     
     private Material(int drpType, int dur, int stack, int dmg, int drp, boolean solid){
