@@ -8,30 +8,29 @@ import com.freedsuniverse.sidecraft.material.tools.Quality;
 public class Inventory {
     private Item[][] contents;
     
-    public final static int COLUMNS = 5;
     public final static int ROWS = 4;
+    public final static int COLUMNS = 5;
     
     public Inventory() {
-        contents = new Item[COLUMNS][ROWS];
+        contents = new Item[ROWS][COLUMNS];
         contents[0][0] = new Pickaxe(Quality.STONE);
-        contents[1][0] = new Pickaxe(Quality.IRON);
-        contents[2][0] = new Pickaxe(Quality.SILVER);
+        contents[0][1] = new Pickaxe(Quality.IRON);
+        contents[0][2] = new Pickaxe(Quality.SILVER);
     }
     
     public void add(Item type) {
-        for(int y = 0; y < contents[0].length; y++){
-            for (int x = 0; x < contents.length; x++) {
-                if (contents[x][y] != null) {
-                    if (contents[x][y].getType() == type.getType()) {
-                        if (contents[x][y].getAmount() < contents[x][y].getType().getMaxStackSize()) {
-                            int amount = contents[x][y].getType().getMaxStackSize() - contents[x][y].getAmount();
+        for(int y = 0; y < contents.length; y++){
+            for (int x = 0; x < contents[0].length; x++) {
+                if (contents[y][x] != null) {
+                    if (contents[y][x].getType() == type.getType()) {
+                        if (contents[y][x].getAmount() < contents[y][x].getType().getMaxStackSize()) {
+                            int amount = contents[y][x].getType().getMaxStackSize() - contents[y][x].getAmount() + 1;
 
                             if (amount > type.getAmount()) {
-                                contents[x][y].modifyAmount(type.getAmount());
+                                contents[y][x].modifyAmount(type.getAmount());
                                 type.modifyAmount(-1 * type.getAmount());
-                            }
-                            else {
-                                contents[x][y].setAmount(amount);
+                            }else {
+                                contents[y][x].setAmount(amount);
                                 type.modifyAmount(-1 * amount);
                             }
 
@@ -47,7 +46,7 @@ public class Inventory {
         if (type.getAmount() > 0) {
             for (int y = 0; y < contents.length; y++) {
                 for (int x = 0; x < contents[0].length; x++) {
-                    if (contents[x][ y]  == null) {
+                    if (contents[y][x]  == null) {
                         setAt(x, y, type);
                         return;
                     }
@@ -57,12 +56,12 @@ public class Inventory {
     }
 
     public Item getAt(int column, int row) {
-        return getContents()[column][ row];
+        return getContents()[row][column];
     }
 
     public void setAt(int column, int row, Item handled) {
-        if (column < contents.length && row < contents[0].length && row > -1 && column > -1) {
-            contents[column][ row] = handled;
+        if (row < contents.length && column < contents[0].length && column > -1 && row > -1) {
+            contents[row][column] = handled;
         }
     }
 
@@ -77,11 +76,11 @@ public class Inventory {
     }
 
     public int[] getIndex(MaterialStack stack) {
-        for(int x = 0; x < contents.length; x++){
-            for (int y = 0; y < contents[0].length; y++) {
-                if (contents[x][ y] != null) {
-                    if (contents[x][ y].getType().getId() == stack.getType().getId()) {
-                        return new int[] { x, y };
+        for(int y = 0; y < contents.length; y++){
+            for (int x = 0; x < contents[0].length; x++) {
+                if (contents[y][x] != null) {
+                    if (contents[y][x].getType().getId() == stack.getType().getId()) {
+                        return new int[] {x, y};
                     }
                 }
             }

@@ -170,8 +170,8 @@ public class EntityInventory extends Inventory {
     private int[] getSelectedBox() {
         Rectangle mouse = new Rectangle(Mouse.getX(), Mouse.getY(), 3, 3);
 
-        for (int y = 0; y < this.getContents()[0].length; y++) {
-            for (int x = 0; x < this.getContents().length; x++) {
+        for (int y = 0; y < this.getContents().length; y++) {
+            for (int x = 0; x < this.getContents()[0].length; x++) {
                 Rectangle box = new Rectangle(this.x + X_DIFF + (38 * x), this.y + Y_DIFF - (37 * y), 30, 30);
                 if (mouse.intersects(box)) {
                     return new int[] { x, y };
@@ -187,11 +187,11 @@ public class EntityInventory extends Inventory {
         Engine.render(x, y, Main.inventoryTile);
         Engine.render(new Rectangle(x + 25, y + 25, 90, 90), owner.getSkin());
 
-        for (int y = 0; y < this.getContents()[0].length; y++) {
-            for (int x = 0; x < this.getContents().length; x++) {
+        for (int y = 0; y < this.getContents().length; y++) {
+            for (int x = 0; x < this.getContents()[0].length; x++) {
                 Rectangle box = new Rectangle(this.x + X_DIFF + (38 * x), this.y + Y_DIFF - (38 * y) + 1, 30, 30);             
-                if (getContents()[x][y] != null) {                   
-                    getContents()[x][y].draw(box, true);                 
+                if (getContents()[y][x] != null) {                   
+                    getContents()[y][x].draw(box, true);                 
                 }
                 if(box.contains(Mouse.getPoint())){
                     if(box.contains(Mouse.getPoint())){
@@ -201,12 +201,12 @@ public class EntityInventory extends Inventory {
             }
         }
         
-        for(int x = 0; x < craftingArea.length; x++){
-            for(int y = 0; y < craftingArea[0].length; y++){
-                Rectangle box = craftingArea[x][y].getBounds();               
+        for(int y = 0; y < craftingArea.length; y++){
+            for(int x = 0; x < craftingArea[0].length; x++){
+                Rectangle box = craftingArea[y][x].getBounds();               
                 
-                if(craftingArea[x][y].getContent() != null){
-                    craftingArea[x][y].getContent().draw(box, true);
+                if(craftingArea[y][x].getContent() != null){
+                    craftingArea[y][x].getContent().draw(box, true);
                 }
                 
                 if(box.contains(Mouse.getPoint())){
