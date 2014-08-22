@@ -1,50 +1,63 @@
 package com.freedsuniverse.sidecraft.screen;
+import javax.swing.JLabel;
+import javax.swing.SpringLayout;
+import javax.swing.SwingConstants;
+import javax.swing.JComboBox;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
 
-import java.awt.Rectangle;
-import java.awt.event.MouseEvent;
+import com.freedsuniverse.sidecraft.Main;
 
-import com.freedsuniverse.sidecraft.Settings;
-import com.freedsuniverse.sidecraft.Sidecraft;
-import com.freedsuniverse.sidecraft.engine.Engine;
-import com.freedsuniverse.sidecraft.input.Mouse;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
-public class SettingsMenu extends Screen{
+
+public class SettingsMenu extends Screen {
+    private static final long serialVersionUID = 1L;
+    private JComboBox comboBox;
     
-    Screen last;
-    Button sound, back;
-    public SettingsMenu(Screen l){
-        last = l;
-        setBackgroundTile(l.getBackgroundTile());
+    public SettingsMenu() {
+        SpringLayout springLayout = new SpringLayout();
+        setLayout(springLayout);
         
-        sound = new Button("Sound: " + Settings.SOUND, Button.DEFAULT_TILE, new Rectangle(Sidecraft.width / 2 - 32 * 4, Sidecraft.height / 2 + 16, 32*8, 32));
-        back = new Button("Back", Button.DEFAULT_TILE, new Rectangle(10, 10, 32*8, 32));
-        setVisible(true);
-    }
-
-    @Override
-    public void update() {
-        if(!Mouse.clicked(MouseEvent.BUTTON1)) return;
+        JLabel lblResolution = new JLabel("Resolution");
+        lblResolution.setHorizontalAlignment(SwingConstants.CENTER);
+        springLayout.putConstraint(SpringLayout.NORTH, lblResolution, 60, SpringLayout.NORTH, this);
+        springLayout.putConstraint(SpringLayout.WEST, lblResolution, 190, SpringLayout.WEST, this);
+        springLayout.putConstraint(SpringLayout.EAST, lblResolution, -190, SpringLayout.EAST, this);
+        add(lblResolution);
         
-        if(sound.getBounds().contains(Mouse.getPoint())){
-            Settings.SOUND = !Settings.SOUND;
-            sound.setText("Sound: " + Settings.SOUND);
-            Sidecraft.music.stop();
-        }else if(back.getBounds().contains(Mouse.getPoint())){
-            Sidecraft.currentScreen = last;
-        }
+        comboBox = new JComboBox();
+        comboBox.setModel(new DefaultComboBoxModel(new String[] {"1920x1080", "1280x720", "1024x576", "960x540"}));
+        comboBox.setSelectedIndex(3);
+        springLayout.putConstraint(SpringLayout.NORTH, comboBox, 6, SpringLayout.SOUTH, lblResolution);
+        springLayout.putConstraint(SpringLayout.WEST, comboBox, 151, SpringLayout.WEST, this);
+        springLayout.putConstraint(SpringLayout.EAST, comboBox, -151, SpringLayout.EAST, this);
+        add(comboBox);
         
-    }
-    
-    @Override
-    public void draw() {
-        if(!isVisible()) return;
-        
-        for(int x = 0; x < (Sidecraft.width / 32) + 1; x++){
-            for(int y = 0; y < (Sidecraft.height / 32) + 1; y++){
-                Engine.render(x * 32, y * 32, getBackgroundTile());
+        JButton btnBack = new JButton("Back");
+        btnBack.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                Main.setScreen(getPreviousScreen());
             }
-        }
-        sound.draw();
-        back.draw();       
+        });
+        springLayout.putConstraint(SpringLayout.NORTH, btnBack, 10, SpringLayout.NORTH, this);
+        springLayout.putConstraint(SpringLayout.WEST, btnBack, 10, SpringLayout.WEST, this);
+        add(btnBack);
+        
+        JButton btnAccept = new JButton("Accept");
+        btnAccept.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String res = (String)(comboBox.getSelectedItem());
+                String[] items = res.split("x");
+                
+                Main.setResolution(Integer.valueOf(items[0]).intValue(), Integer.valueOf(items[1]).intValue());
+                System.out.println("yo");
+            }
+        });
+        springLayout.putConstraint(SpringLayout.WEST, btnAccept, 179, SpringLayout.WEST, this);
+        springLayout.putConstraint(SpringLayout.SOUTH, btnAccept, -35, SpringLayout.SOUTH, this);
+        add(btnAccept);
+
     }
 }

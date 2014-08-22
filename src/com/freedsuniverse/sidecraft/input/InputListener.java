@@ -38,6 +38,7 @@ public class InputListener implements KeyListener, MouseListener, MouseMotionLis
         toggleKeys(e, true);
     }
 
+    //TODO: lol@else if chains
     private void toggleKeys(KeyEvent e, boolean toggleType){          
         if(e.getKeyCode() == KeyEvent.VK_A) Key.A.toggle(toggleType);
         else if(e.getKeyCode() == KeyEvent.VK_W) Key.W.toggle(toggleType);
@@ -46,6 +47,8 @@ public class InputListener implements KeyListener, MouseListener, MouseMotionLis
         else if(e.getKeyCode() == KeyEvent.VK_B) Key.B.toggle(toggleType);
         else if(e.getKeyCode() == KeyEvent.VK_F5)Key.F5.toggle(toggleType);
         else if(e.getKeyCode() == KeyEvent.VK_I) Key.I.toggle(toggleType);
+        else if(e.getKeyCode() == KeyEvent.VK_F) Key.F.toggle(toggleType);
+        else if(e.getKeyCode() == KeyEvent.VK_M) Key.M.toggle(toggleType);
         else if(e.getKeyCode() == KeyEvent.VK_SPACE) Key.SPACE.toggle(toggleType);
         else if(e.getKeyCode() == KeyEvent.VK_1) Key.ONE.toggle(toggleType);
         else if(e.getKeyCode() == KeyEvent.VK_2) Key.TWO.toggle(toggleType);

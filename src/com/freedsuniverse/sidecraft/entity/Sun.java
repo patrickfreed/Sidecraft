@@ -1,52 +1,44 @@
 package com.freedsuniverse.sidecraft.entity;
 
+import java.awt.AlphaComposite;
 import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.RadialGradientPaint;
+import java.awt.MultipleGradientPaint.CycleMethod;
+import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
 
-import com.freedsuniverse.sidecraft.Sidecraft;
-import com.freedsuniverse.sidecraft.engine.Light;
+import com.freedsuniverse.sidecraft.world.Location;
 
-public class Sun extends LightSource {
-    private final static Color MIDDAY = new Color(0, 0, 0, 255);
-    private final static long DAY_LENGTH = 60000;
-    private final static Light[] stages = {new Light(MIDDAY), new Light(MIDDAY), new Light(MIDDAY), new Light(Color.yellow, 200), new Light(Color.orange, 200), new Light(Color.red, 200), 
-        new Light(Color.darkGray, 150), new Light(Color.black, 100), new Light(Color.black, 100), new Light(Color.black, 100), new Light(Color.darkGray, 150), new Light(Color.orange, 200)}; 
-    private final static int RADIUS = 15;
-    
-    private long time, lasttime;
-    private int day, stage, increase;
+public class Sun extends LightSource{
+
+    private final static int RADIUS = 32*45;
     
     public Sun() {
-        super(MIDDAY, 255, RADIUS);
-        time = 0;
-        lasttime = System.currentTimeMillis();
-        day = 1;
-        stage = 0;
-        increase = (int) (DAY_LENGTH / stages.length);
+        super(1.0, RADIUS);
     }
-    
-    @Override
-    public void draw() {
-    }
-    
-    public void update() {
-        setLocation(Sidecraft.playerLoc);
-        
-        time += System.currentTimeMillis() - lasttime;
-        lasttime = System.currentTimeMillis();
 
-        int oldstage = stage;
-        stage = (int) (time / increase);
+    public void light() {
+        BufferedImage i = getLocation().getWorld().getLightMap();
+        Graphics2D g2 = (Graphics2D) i.getGraphics();
+        Location loc = getLocation().getWorld().getLightMapLocation();
         
-        if(stage >= stages.length) {
-            getLocation().getWorld().lightUpdate();
-            day++;
-            time = 0;
-            System.out.println("Day " + day);
-        }else if(stage != oldstage) {
-            setLight(stages[stage], RADIUS);
-            getLocation().getWorld().lightUpdate();
-        }
+        int[] coords = getLocation().toArray();
+        int[] map = loc.toArray();                 //TODO: put all this crap into LightMap.class
+        int xDiff = coords[0] - map[0];
+        int yDiff = coords[1] - map[1];
         
-        super.update();
+        g2.setComposite(AlphaComposite.DstOut);
+        Point2D center = new Point2D.Float(xDiff, yDiff);
+         
+        Point2D focus = new Point2D.Float(xDiff, yDiff);
+         
+        float[] dist = {0.5f, 1f};
+        Color[] colors = {new Color(100, 0, 0, getIntensity()), new Color(50, 0, 0, 0)};
+
+        RadialGradientPaint rgp = new RadialGradientPaint(center, getRadius(), focus, dist, colors, CycleMethod.NO_CYCLE);
+        g2.setPaint(rgp);
+         
+        g2.fillOval(xDiff - getRadius(), yDiff - getRadius(), getRadius() * 2, getRadius() * 4);
     }
 }

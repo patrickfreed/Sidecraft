@@ -2,7 +2,7 @@ package com.freedsuniverse.sidecraft.input;
 
 public class Key {
     public static Key W = new Key(), A = new Key(), S = new Key() ,D = new Key(), B = new Key(), I = new Key(), F5 = new Key(), SPACE = new Key(), ESCAPE = new Key(),
-        ONE = new Key(), TWO = new Key(), THREE = new Key(), FOUR = new Key(), FIVE = new Key();
+        ONE = new Key(), TWO = new Key(), THREE = new Key(), FOUR = new Key(), FIVE = new Key(), F = new Key(), M = new Key();
     
     boolean down, old, current;
     
@@ -12,6 +12,7 @@ public class Key {
         S.toggle(false);
         D.toggle(false);
         B.toggle(false);
+        F.toggle(false);
         F5.toggle(false);
         SPACE.toggle(false);
         I.toggle(false);

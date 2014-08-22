@@ -21,6 +21,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
+import com.freedsuniverse.sidecraft.engine.Engine;
 import com.freedsuniverse.sidecraft.entity.Player;
 import com.freedsuniverse.sidecraft.input.InputListener;
 import com.freedsuniverse.sidecraft.inventory.EntityInventory;
@@ -30,12 +31,14 @@ import com.freedsuniverse.sidecraft.material.Tool;
 import com.freedsuniverse.sidecraft.screen.Menu;
 import com.freedsuniverse.sidecraft.screen.Paused;
 import com.freedsuniverse.sidecraft.screen.SaveLoader;
+import com.freedsuniverse.sidecraft.screen.SettingsMenu;
 import com.freedsuniverse.sidecraft.world.Location;
-import com.freedsuniverse.sidecraft.world.World;
+import com.freedsuniverse.sidecraft.world.GameWorld;
 
-public class Main extends Applet{
+public class Main extends Applet {
     private static final long serialVersionUID = 1L;
-    public static JPanel contentPane;   
+    public static JPanel contentPane;  
+    private static JFrame frame;
     private static Sidecraft s;
     private static int width, height;
     @SuppressWarnings("unused")
@@ -47,20 +50,21 @@ public class Main extends Applet{
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    JFrame frame = new JFrame();
+                    frame = new JFrame();
                     
-                    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                    frame.setBounds(100, 100, 800, 400);
-                    frame.setResizable(false);
+                    width = 32 * Settings.DISPLAYED_BLOCKS;
+                    height = width  * 9 / 16;
+                    //Settings.BLOCK_SIZE = width / Settings.DISPLAYED_BLOCKS;
                     
-                    setup(frame);
+                    //frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                    //frame.setBounds(100, 100, width, height);
+                    //frame.setResizable(false);
                     
-                    width = 800;
-                    height = 400;
-                    frame.setContentPane(contentPane);
                     
-                    frame.setTitle("Sidecraft " + Settings.VERSION);                  
-                    frame.setVisible(true);
+                    //setup(frame);
+                    
+                    setResolution(width, height);
+                    setScreen(Menu.class.getName());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -82,10 +86,12 @@ public class Main extends Applet{
     }
 
     private static void loadTextures() {
+        textures = new ArrayList<BufferedImage>();
+        
         int length = 15;
   
         for(int x = 0; x < length; x++){
-            textures.add(getImage("/material/" + x + ".png"));
+            textures.add(getImage("/material/" + x + ".png", Settings.BLOCK_SIZE, Settings.BLOCK_SIZE));
         }
 
         toolbarSelectionTile = getImage("/misc/toolbar_selection.png");
@@ -96,8 +102,7 @@ public class Main extends Applet{
         workbenchTile = getImage("/misc/workbench_interior.png");
     }
     
-    private static void setup(Container c) {
-        textures = new ArrayList<BufferedImage>();
+    private static void setup(Container c) {        
         loadTextures();
         music = new Sound("/audio/music.ogg");
         
@@ -109,7 +114,8 @@ public class Main extends Applet{
         contentPane.add(new Menu(), Menu.class.getName());
         contentPane.add(new SaveLoader(), SaveLoader.class.getName());
         contentPane.add(new Paused(), Paused.class.getName());
-        s = new Sidecraft();
+        contentPane.add(new SettingsMenu(), SettingsMenu.class.getName());
+        s = new Sidecraft(width, height);
         contentPane.add(s, Sidecraft.class.getName());
         
         for(Component t:contentPane.getComponents()) {
@@ -117,7 +123,12 @@ public class Main extends Applet{
             t.addMouseListener(InputListener.i);
         }       
         
-        setScreen(Menu.class.getName());
+        frame.setContentPane(contentPane);
+        
+        frame.setIconImage(Main.getImage("/misc/menu/icon.png"));
+        
+        frame.setTitle("Sidecraft " + Settings.VERSION);                  
+        frame.setVisible(true);
     }
     
     public void init() {
@@ -135,17 +146,27 @@ public class Main extends Applet{
         }
     }
     
+    public static BufferedImage getImage(String file, int width, int height) {
+        BufferedImage i = getImage(file);
+        
+        if(i.getWidth() != width && i.getHeight() != height) {
+            i = Engine.scale(i, width, height);
+        }
+        
+        return i;
+    }
+    
     public static void loadGame(String name) {
         try { 
             File dir = new File(Settings.defaultDirectory() + name + File.separator);
             
-            ArrayList<World> worlds = new ArrayList<World>();
-            ArrayList<World> ws = new ArrayList<World>();
+            ArrayList<GameWorld> worlds = new ArrayList<GameWorld>();
+            ArrayList<GameWorld> ws = new ArrayList<GameWorld>();
             String player = "";
             
             for(File f:dir.listFiles()) {
                 if(f.isDirectory() && f.getName().contains("world_")){
-                    worlds.add(World.load(f));
+                    worlds.add(GameWorld.load(f));
                 }else if(f.isFile() && f.getName().equals("player.txt")){
                     player = read(f);
                 }
@@ -171,7 +192,7 @@ public class Main extends Applet{
                 }
             }
             
-            p.load(playerLoc, inv);
+            p.spawn(playerLoc, inv);
             
 //            for(String s:worlds) {
 //                HashMap<String, Entity> e = new HashMap<String, Entity>();
@@ -216,18 +237,20 @@ public class Main extends Applet{
     }
     
     public static boolean saveGame(String name) {        
+        //TODO: fix
+        
         try {  
             File dir = new File(Settings.defaultDirectory() + name + File.separator);
             if(!dir.exists()) {
                 dir.mkdir();
             }
             
-            for(World w:s.worlds.values()) {
+            for(GameWorld w:s.worlds.values()) {
                 w.save();
             }      
             
-            File p = new File(dir.getCanonicalFile() + File.separator + "player.txt");
-            if(!write(p, s.player.toString())) return false;
+            //File p = new File(dir.getCanonicalFile() + File.separator + "player.txt");
+            //if(!write(p, s.player.toString())) return false;
         }catch(Exception e) {
             e.printStackTrace();
             return false;
@@ -294,5 +317,17 @@ public class Main extends Applet{
         }
         
         return l;
+    }
+
+    public static void setResolution(int width, int height) {
+        Settings.BLOCK_SIZE = width / Settings.DISPLAYED_BLOCKS;
+        
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setBounds(100, 100, width, height);
+        frame.setResizable(false);
+
+        loadTextures();
+        
+        setup(frame);
     }
 }

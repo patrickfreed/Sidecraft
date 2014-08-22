@@ -6,6 +6,7 @@ import java.awt.image.BufferedImage;
 
 import com.freedsuniverse.sidecraft.Main;
 import com.freedsuniverse.sidecraft.engine.Engine;
+import com.freedsuniverse.sidecraft.engine.RenderQueueItem;
 import com.freedsuniverse.sidecraft.material.Item;
 
 public class Toolbar {
@@ -19,7 +20,10 @@ public class Toolbar {
 
     private Rectangle[] boxes;
 
-    public Toolbar() {
+    private Inventory i;
+    
+    public Toolbar(Inventory i) {
+        this.i = i;
         this.currentIndex = 0;
         x = Main.getPaneWidth() / 2 - Main.toolbarTile.getWidth() / 2;
         y = Main.getPaneHeight() - 100;
@@ -35,7 +39,7 @@ public class Toolbar {
     }
     
     public Item getSelectedObj() {
-        return Main.getGame().player.getInventory().getAt(currentIndex, 0);
+        return i.getAt(currentIndex, 0);
     }
 
     public int getCurrentIndex() {
@@ -65,24 +69,24 @@ public class Toolbar {
     }
 
     public void draw() {
-        Engine.render(x, y, Main.toolbarTile);
+        Engine.addQueueItem(new RenderQueueItem(x, y, Main.toolbarTile));
 
         for (int x = 0; x < boxes.length; x++) {
-            Item item = Main.getGame().player.getInventory().getAt(x, 0);
+            Item item = i.getAt(x, 0);
 
             if (item != null) {
-                Engine.render(boxes[x], item.getType().getImage());
+                Engine.addQueueItem(new RenderQueueItem(item.getType().getImage(), boxes[x]));
 
                 if (x == currentIndex) {
-                    Engine.render(boxes[x].x - 3, boxes[x].y - 3, this.tile);
+                    Engine.addQueueItem(new RenderQueueItem(boxes[x].x - 3, boxes[x].y - 3, this.tile));
                 }
 
                 if (item.getAmount() > 0)
-                    Engine.renderString(String.valueOf(Main.getGame().player.getInventory().getAt(x, 0).getAmount()), (int)boxes[x].getCenterX() + 5, (int)boxes[x].getCenterY() - 1, Color.WHITE);
+                    Engine.addQueueItem(new RenderQueueItem(String.valueOf(i.getAt(x, 0).getAmount()), (int)boxes[x].getCenterX() + 5, (int)boxes[x].getCenterY() - 1, Color.WHITE));
             }
             else {
                 if (x == currentIndex) {
-                    Engine.render(boxes[x].x - 3, boxes[x].y - 3, this.tile);
+                    Engine.addQueueItem(new RenderQueueItem(boxes[x].x - 3, boxes[x].y - 3, this.tile));
                 }
             }
         }

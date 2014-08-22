@@ -35,7 +35,7 @@ public class SaveLoader extends Screen {
         File[] dirs = new File(Settings.defaultDirectory()).listFiles();
         
         //-----------------------------
-        //Add the labels yo
+        //Add the labels
         //-----------------------------
         
         info = new JLabel("Click on a world to select it.");
@@ -102,7 +102,7 @@ public class SaveLoader extends Screen {
         back.setOpaque(true);                 
         
         //------------------------
-        //Add buttons
+        // Add buttons
         //------------------------
         
         JButton btnLoad = new JButton("Load World");
@@ -119,6 +119,8 @@ public class SaveLoader extends Screen {
             }
         });
         springLayout.putConstraint(SpringLayout.NORTH, btnLoad, 10, SpringLayout.SOUTH, back);
+        springLayout.putConstraint(SpringLayout.WEST, btnLoad, 60, SpringLayout.WEST, back);
+        springLayout.putConstraint(SpringLayout.EAST, btnLoad, -60, SpringLayout.EAST, back);
         
         JButton btnEdit = new JButton("Edit");
         btnEdit.addActionListener(new ActionListener() {
@@ -126,17 +128,22 @@ public class SaveLoader extends Screen {
                 editSave();
             }
         });
+        
+        springLayout.putConstraint(SpringLayout.NORTH, btnEdit, 10, SpringLayout.SOUTH, btnLoad);
+        springLayout.putConstraint(SpringLayout.WEST, btnEdit, 0, SpringLayout.WEST, btnLoad);
+        springLayout.putConstraint(SpringLayout.EAST, btnEdit, 0, SpringLayout.EAST, btnLoad);
+        
         //JButton btnDelete = new JButton("Delete");
         
         JButton btnBack = new JButton("Back");
-        btnBack.setOpaque(false);
-        btnBack.setBorder(new LineBorder(Color.DARK_GRAY));
-        btnBack.setForeground(Color.DARK_GRAY);
+        btnBack.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                Main.setScreen(getPreviousScreen());
+            }
+        });
         
-       
-        btnEdit.setOpaque(false);
-        btnEdit.setBorder(new LineBorder(Color.DARK_GRAY));
-        btnEdit.setForeground(Color.DARK_GRAY);
+        springLayout.putConstraint(SpringLayout.NORTH, btnBack, 10, SpringLayout.NORTH, this);
+        springLayout.putConstraint(SpringLayout.WEST, btnBack, 10, SpringLayout.WEST, this);
         
         add(btnEdit);
         add(btnLoad);

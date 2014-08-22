@@ -2,7 +2,10 @@ package com.freedsuniverse.sidecraft.entity;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
+
+import org.jbox2d.collision.shapes.PolygonShape;
+import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.FixtureDef;
 
 import com.freedsuniverse.sidecraft.Main;
 import com.freedsuniverse.sidecraft.Settings;
@@ -10,50 +13,66 @@ import com.freedsuniverse.sidecraft.engine.Animation;
 import com.freedsuniverse.sidecraft.engine.Engine;
 import com.freedsuniverse.sidecraft.inventory.Inventory;
 import com.freedsuniverse.sidecraft.material.Item;
-import com.freedsuniverse.sidecraft.material.Material;
 import com.freedsuniverse.sidecraft.material.MaterialStack;
+import com.freedsuniverse.sidecraft.world.CollisionListener;
 import com.freedsuniverse.sidecraft.world.Location;
 
 public class LivingEntity extends Entity{
-
-    private final double SPACE = 0.25;
-    
-    protected int yDirection, xDirection, ySpeed, xSpeed;
-    
-    private static final double STEP_LENGTH = 3.0;
     private static final long DAMAGE_TIME = 500, RECENT_DAMAGE_TIME = 4000;
     protected String id;
     
-    private Animation anime;
+    public static final int STATIONARY = 0, WALKING = 1;
+    
+    private Animation[] anime;
     private int health, recentdmg;
     private Inventory inv;
-    private double spaceMoved = 0;   
-    private boolean blocked = false, damaged = false;
+    private boolean damaged = false;
     private long dmg = -1;
 
-    
-    public LivingEntity(String id, int w, int h, int health) {
-        anime = new Animation(Animation.read("/entity/" + id + ".png", w, h), 10);
+    public int footContacts;
+    private int currentAnimation;
+    private boolean facingLeft;
+
+    public LivingEntity(String id, int w, int h, int health, float density) {
+        super();
+      
+        footContacts = 0;
+        
+        anime = new Animation[2];
+        
+        anime[STATIONARY] = Animation.read("/entity/" + id + "/stationary.png", w, h, 10);
+        anime[WALKING] = Animation.read("/entity/" + id + "/walking.png", w, h, 10);
+        
+        PolygonShape ps = new PolygonShape();
+        ps.setAsBox(anime[0].getSlide().getWidth() / ((float)Settings.BLOCK_SIZE * 2.0f) - 0.1f, anime[0].getSlide().getHeight() / ((float)Settings.BLOCK_SIZE * 2.0f) - 0.05f);
+        
+        fd.shape = ps;
+        bd.fixedRotation = true;
+        fd.friction = 0.3f;
+        bd.allowSleep = false;
+        fd.density = density;
+        
         inv = new Inventory();
         this.id = id;
         setHealth(health);
+        facingLeft = false;
     }
-     
+    
     public void draw() { 
         if(damaged) {
             if(System.currentTimeMillis() - dmg <= DAMAGE_TIME) {
                 
-                Engine.render(getLocation(), Main.getTint(anime.getSlide(), Color.red, 0));
+                Engine.render(getLocation(), Main.getTint(anime[0].getSlide(), Color.red, 0));
             }else {
-                Engine.render(getLocation(), anime.getSlide());
+                Engine.render(getLocation(), anime[0].getSlide());
                 damaged = false;      
             }
         }else {
-            Engine.render(getLocation(), anime.getSlide());
+            Engine.render(this);
         }
         
         if(recentdmg > 0) {
-            Engine.renderString("" + recentdmg, getLocation().modify(0, 0.4), Color.white);
+            Engine.renderString("" + recentdmg, getLocation().modify(-this.getWidth() / 2.0f, this.getHeight() / 2.0f + 0.25f), Color.white);
             
             if(System.currentTimeMillis() - dmg >= RECENT_DAMAGE_TIME) {
                 recentdmg = 0;
@@ -69,66 +88,33 @@ public class LivingEntity extends Entity{
             c++;
         }
         
-        Engine.renderString(health, getLocation().modify(0, 0.25), Color.green);
+        Engine.renderString(health, getLocation().modify(-this.getWidth() / 2.0f, this.getHeight() / 2.0f + 0.1f), Color.green);
+        //Engine.renderString(String.valueOf(this.footContacts), getLocation().modify(0, 0.5), Color.white);
     }
     
     @Override
     public BufferedImage getSkin() {
-        return anime.getSlide();
-    }
-    
-    private void updateCollision() {
-        int width = getBounds().width;
-        double yMod = -getBounds().height / 32;
-        ArrayList<Material> check = new ArrayList<Material>();
-        
-        for(double x = 0.0; x * 32.0 < width; x += 0.5) {
-            check.add(getLocation().getWorld().getBlockAt(getLocation().modify(x, yMod)).getType());
-        }
-        
-        for(Material m:check) {
-            if(!m.isSolid()) {
-                yDirection = -1;
-                ySpeed = 1;
-            }else {
-                ySpeed = 0;
-            }
-        }
-        
-        if(xSpeed > 0) {
-            check = new ArrayList<Material>();
-            if(xDirection == Settings.RIGHT) {
-                double xMod = getBounds().width / 32.0 + SPACE;
-                
-                for(double x = 0.0; x * 32.0 < getBounds().height; x += 0.5) {
-                    check.add(getLocation().getWorld().getBlockAt(getLocation().modify(xMod, -x)).getType());
-                }
-            }else {
-                for(double x = 0.0; x * 32.0 < getBounds().height; x += 0.5) {
-                    check.add(getLocation().getWorld().getBlockAt(getLocation().modify(-SPACE, -x)).getType());
-                } 
-            }
-            for(Material m:check) {
-                if(m.isSolid()) {
-                    xSpeed = 0;
-                    blocked = true;
-                }else {
-                    blocked = false;
-                }
-            }
-        }
-    }
-    
-    public boolean isBlocked() {
-        return blocked;
+        return anime[currentAnimation].getSlide(facingLeft);
     }
     
     public void update() {
-        updateCollision();
-        updatePosition(xDirection, yDirection, xSpeed, ySpeed);
-        anime.update();
+        super.update();
+        
+        if(footContacts > 0 && Math.abs(this.getBody().getLinearVelocity().x) > 0) {
+            currentAnimation = WALKING;
+        }else {
+            currentAnimation = STATIONARY;
+        }
+        
+        if(this.getBody().getLinearVelocity().x < 0) {
+            facingLeft = true;
+        }else if(this.getBody().getLinearVelocity().x > 0) {
+            facingLeft = false;
+        }
+        
+        anime[currentAnimation].update();
     }
-   
+
     public void setHealth(int h) {
         health = h;
     }
@@ -138,18 +124,16 @@ public class LivingEntity extends Entity{
         recentdmg += d;
         dmg = System.currentTimeMillis();
         damaged = true;
+        
         if(health <= 0) {
             destroy();
         }
     }
-
-    public void spawn(Location l) {
-        setLocation(l);
-        id += l.getWorld().registerEntity(this);
-    }
     
     @Override
     public void destroy() {
+        if(isDestroyed()) return;
+        
         getLocation().getWorld().unregisterEntity(this);
         
         Item[][] contents = getInventory().getContents();
@@ -158,27 +142,12 @@ public class LivingEntity extends Entity{
             for(int y = 0; y < contents[0].length; y++) {
                 if(contents[x][y] != null && contents[x][y] instanceof MaterialStack) {
                     MaterialStack t = (MaterialStack) contents[x][y];
-                    DropEntity e = new DropEntity(t.getType(), getLocation());
-                    e.spawn();
+                    new DropEntity(t.getType()).spawn(getLocation());
                 }
             }
         }
-    }
-
-    public void updatePosition(int xDirection, int yDirection, int xSpeed, int ySpeed){
-        double xDiff = (xDirection * xSpeed);
-        double yDiff = (yDirection * ySpeed);
-
-        getLocation().modifyX(xDiff / 32);
-        getLocation().modifyY(yDiff / 32);
-               
-        spaceMoved += Math.abs(xDiff);
-        if(getLocation().modify(0, -1).getBlockAt().getType().isSolid()){
-            if(spaceMoved > STEP_LENGTH * 32){
-                Material.getSound(getLocation().getBlockAt().getTypeId()).play();
-                spaceMoved = 0;
-            }
-        }
+        
+        destroyed = true;
     }
 
     public int getHealth() {
@@ -192,5 +161,20 @@ public class LivingEntity extends Entity{
     @Override
     public String toString() {
         return getLocation() + "\n" + getInventory();  
+    }
+    
+    @Override
+    public void spawn(Location l) {
+        super.spawn(l);
+        FixtureDef fd = new FixtureDef(); 
+        
+        fd.userData = CollisionListener.FOOT_SENSOR;
+        
+        fd.isSensor = true;
+        PolygonShape ps = new PolygonShape();
+        ps.setAsBox(this.getWidth() / 2.0f - 0.2f, 0.1f, new Vec2(0, -(this.getHeight() / 2.0f)), 0);
+        fd.shape = ps;
+        
+        this.getBody().createFixture(fd);
     }
 }

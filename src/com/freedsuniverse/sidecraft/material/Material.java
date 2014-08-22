@@ -55,6 +55,10 @@ public enum Material{
         return Sound.sedimentWalk;
     }
     
+    public static boolean isOre(Material mat) {
+        return mat == Material.COAL_ORE || mat == Material.SILVER_ORE || mat == Material.GOLD_ORE;
+    }
+    
     private Material(int drpType){
         this(drpType, 4);
     }

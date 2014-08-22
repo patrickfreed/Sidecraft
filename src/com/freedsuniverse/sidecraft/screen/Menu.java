@@ -39,5 +39,16 @@ public class Menu extends Screen {
         label.setMinimumSize(label.getSize());
         label.setIcon(new ImageIcon(Menu.class.getResource("/misc/menu/background.png")));
         add(label);
+        
+        JButton btnSettings = new JButton("Settings");
+        btnSettings.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                Main.setScreen(SettingsMenu.class.getName());
+            }
+        });
+        springLayout.putConstraint(SpringLayout.NORTH, btnSettings, 6, SpringLayout.SOUTH, startGame);
+        springLayout.putConstraint(SpringLayout.WEST, btnSettings, 362, SpringLayout.WEST, this);
+        springLayout.putConstraint(SpringLayout.EAST, btnSettings, -362, SpringLayout.EAST, this);
+        add(btnSettings);
     } 
 }

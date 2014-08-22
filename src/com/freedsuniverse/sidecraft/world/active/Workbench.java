@@ -49,12 +49,12 @@ public class Workbench extends Block{
             outputSlot = new Slot(null, outputBox);
             initiateBench();
         }else{
-            Main.getGame().player.setAction(0);
+            getLocation().getWorld().getPlayer().setAction(0);
             
             for(int x = 0; x < craftingArea.length; x++){
                 for(int y =0; y < craftingArea[0].length; y++){
                     if(craftingArea[x][y].getContent() != null){
-                        new DropEntity(craftingArea[x][y].getContent().getType(), this.getLocation()).spawn();
+                        new DropEntity(craftingArea[x][y].getContent().getType()).spawn(this.getLocation());
                         craftingArea[x][y].setContent(null);
                     }
                 }
@@ -86,11 +86,11 @@ public class Workbench extends Block{
         if(open){
             Engine.addQueueItem(new RenderQueueItem(x, y, Main.workbenchTile));            
             
-            for (int y = 0; y < Main.getGame().player.getInventory().getContents()[0].length; y++) {
-                for (int x = 0; x < Main.getGame().player.getInventory().getContents().length; x++) {
+            for (int y = 0; y < getLocation().getWorld().getPlayer().getInventory().getContents()[0].length; y++) {
+                for (int x = 0; x < getLocation().getWorld().getPlayer().getInventory().getContents().length; x++) {
                     Rectangle box = new Rectangle(this.x + X_DIFF + (38 * x), this.y + Y_DIFF - (38 * y) + 1, 30, 30);
-                    if (Main.getGame().player.getInventory().getContents()[x][y] != null) {
-                        Main.getGame().player.getInventory().getAt(x,y).draw(box, true);                        
+                    if (getLocation().getWorld().getPlayer().getInventory().getContents()[x][y] != null) {
+                        getLocation().getWorld().getPlayer().getInventory().getAt(x,y).draw(box, true);                        
                     }
                     if(box.contains(Mouse.getPoint())){
                         Engine.addQueueItem(new RenderQueueItem(box, EntityInventory.HOVER_COLOR));
@@ -140,9 +140,9 @@ public class Workbench extends Block{
         if(Mouse.clicked(MouseEvent.BUTTON1) || Mouse.clicked(MouseEvent.BUTTON3)){
             if(getSelectedIndecies()[0] != -1){
                 int index[] = getSelectedIndecies();
-                Item[] handledMaterials = EntityInventory.handleSlot(Main.getGame().player.getInventory().getAt(index[0], index[1]), onMouse);
+                Item[] handledMaterials = EntityInventory.handleSlot(getLocation().getWorld().getPlayer().getInventory().getAt(index[0], index[1]), onMouse);
                 
-                Main.getGame().player.getInventory().setAt(index[0], index[1], handledMaterials[0]);
+                getLocation().getWorld().getPlayer().getInventory().setAt(index[0], index[1], handledMaterials[0]);
                 onMouse = handledMaterials[1];
             }else if(getWorkbenchSlot() != null){
                 Slot slot = getWorkbenchSlot();
@@ -191,8 +191,8 @@ public class Workbench extends Block{
     private int[] getSelectedIndecies() {
         Rectangle mouse = new Rectangle(Mouse.getX(), Mouse.getY(), 3, 3);
         
-        for (int y = 0; y < Main.getGame().player.getInventory().getContents()[0].length; y++) {
-            for (int x = 0; x < Main.getGame().player.getInventory().getContents().length; x++) {
+        for (int y = 0; y < getLocation().getWorld().getPlayer().getInventory().getContents()[0].length; y++) {
+            for (int x = 0; x < getLocation().getWorld().getPlayer().getInventory().getContents().length; x++) {
                 Rectangle box = new Rectangle(this.x + X_DIFF + (38 * x), this.y + Y_DIFF - (37 * y), 30, 30);
                 if (mouse.intersects(box)) {
                     return new int[] { x, y };

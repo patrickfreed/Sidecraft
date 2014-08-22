@@ -4,12 +4,14 @@ import java.awt.Color;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
+import com.freedsuniverse.sidecraft.world.Location;
+
 public class RenderQueueItem {
     private BufferedImage img;
     private String message;
     private Rectangle rec;
-    int x, y;
-    Color color;
+    private int x, y;
+    private Color color;
     
     private final int RECTANGLE = 0, IMAGE = 1, STRING = 2;
     
@@ -45,12 +47,16 @@ public class RenderQueueItem {
         mode = IMAGE;
     }
 
+    public RenderQueueItem(Location location, BufferedImage i) {
+        this(i, location.toRectangle(i.getWidth(), i.getHeight()));
+    }
+
     public void draw(){
         if(mode == RECTANGLE){
             Engine.renderRectangle(rec, color);
         }else if(mode == STRING){
             Engine.renderString(message, x, y, this.color);
-        }else{
+        }else {
             Engine.render(rec, img);
         }
     }

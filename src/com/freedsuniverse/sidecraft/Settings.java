@@ -7,18 +7,13 @@ public class Settings {
     public static int BLOCK_SIZE = 32;
     public static boolean DEBUG = false;
     public static boolean SOUND = true;
+    public static int DISPLAYED_BLOCKS = 30;
     
     //controls
     //public static Key INVENTORY_TOGGLE = Keys.I;
     
-    //Directions
-    public final static int LEFT = -1;
-    public final static int RIGHT = 1;
-    public final static int UP = 1;
-    public final static int DOWN = -1;
-    
     //Misc.
-    public final static String VERSION = "Indev 0.2";
+    public final static String VERSION = "Indev 0.3";
     
     //Files
     public final static String SAVE_DIR = System.getenv("USERPROFILE")+ File.separator + "AppData" + File.separator + "Roaming" + File.separator + ".sidecraft" + File.separator;

@@ -6,7 +6,7 @@ import com.freedsuniverse.sidecraft.material.MaterialStack;
 
 public class Pig extends Animal {
     public Pig() {
-        super("pig", 32, 32, 10);
+        super("pig", 30, 30, 10, 16.0f);
         getInventory().add(new MaterialStack(Material.DIRT, 1));
     }
 }

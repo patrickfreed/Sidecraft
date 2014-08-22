@@ -184,8 +184,8 @@ public class EntityInventory extends Inventory {
     public void draw() {           
         if(!isOpen) return;
         
-        Engine.render(x, y, Main.inventoryTile);
-        Engine.render(new Rectangle(x + 25, y + 25, 90, 90), owner.getSkin());
+        Engine.addQueueItem(new RenderQueueItem(x, y, Main.inventoryTile));
+        Engine.addQueueItem(new RenderQueueItem(owner.getSkin(), new Rectangle(x + 25, y + 25, 90, 90)));
 
         for (int y = 0; y < this.getContents().length; y++) {
             for (int x = 0; x < this.getContents()[0].length; x++) {
@@ -239,7 +239,7 @@ public class EntityInventory extends Inventory {
     public void close() {
         if (onMouse != null) {
             for (int x = 0; x < onMouse.getAmount(); x++) {
-                new DropEntity(onMouse.getType(), owner.getLocation()).spawn();
+                new DropEntity(onMouse.getType()).spawn(owner.getLocation());
             }
             onMouse = null;
         }
@@ -247,7 +247,7 @@ public class EntityInventory extends Inventory {
         for (int y = 0; y < this.craftingArea[0].length; y++) {
             for (int x = 0; x < this.craftingArea.length; x++) {
                 if(craftingArea[x][y].getContent() != null)
-                    new DropEntity(craftingArea[x][y].getContent().getType(), owner.getLocation()).spawn();
+                    new DropEntity(craftingArea[x][y].getContent().getType()).spawn(owner.getLocation());
             }
         }
         outputSlot.setContent(null);
@@ -279,5 +279,9 @@ public class EntityInventory extends Inventory {
                 }
         }  
         return s;
+    }
+
+    public boolean isOpen() {
+        return this.isOpen;
     }
 }

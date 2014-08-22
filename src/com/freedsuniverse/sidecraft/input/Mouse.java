@@ -3,15 +3,13 @@ package com.freedsuniverse.sidecraft.input;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 
-import com.freedsuniverse.sidecraft.Main;
+import com.freedsuniverse.sidecraft.Settings;
+import com.freedsuniverse.sidecraft.world.Location;
+
 
 public class Mouse {
     private static boolean m1 = false, oldm1 = false, currentm1 = false, m2 = false, oldm2 = false, currentm2 = false, m3 = false, oldm3 = false, currentm3 = false;
     private static int x = 0,y = 0,w = 0;
-    
-    public static Point getPoint(){
-        return Main.contentPane.getMousePosition();
-    }
     
     public static void modifyScrollWheelValue(int a){
         Mouse.w += a;
@@ -71,5 +69,12 @@ public class Mouse {
         else if(button == MouseEvent.BUTTON3) return m3;
         else return false;
     }
-    
+
+    public static Point getPoint() {
+        return new Point(x, y);
+    }
+
+    public static Location getLocation() {
+        return Location.valueOf(Mouse.x - Settings.BLOCK_SIZE / 2, Mouse.y - Settings.BLOCK_SIZE / 2);
+    }
 }

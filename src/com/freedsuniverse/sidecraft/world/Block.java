@@ -1,6 +1,9 @@
 package com.freedsuniverse.sidecraft.world;
 
-import java.awt.Rectangle;
+import java.awt.Color;
+
+import org.jbox2d.dynamics.Body;
+import org.jbox2d.dynamics.BodyType;
 
 import com.freedsuniverse.sidecraft.Sound;
 import com.freedsuniverse.sidecraft.engine.Engine;
@@ -9,17 +12,26 @@ import com.freedsuniverse.sidecraft.entity.Entity;
 import com.freedsuniverse.sidecraft.entity.TNTPrimed;
 import com.freedsuniverse.sidecraft.material.Material;
 
-public class Block extends Entity{     
-    public static final int TYPE = 0, X = 1, Y = 2, WORLD = 3;
-    
+public class Block extends Entity {       
     private Material data;
     private int health;
 
     public Block(Material d) {
+        super();
+        
         this.data = d;
         health = data.getDurability();
-    }    
 
+        bd.type = BodyType.STATIC;
+        fd.friction = 1.8f;
+        
+        if(d == Material.AIR) {
+            bd.active = false;
+        }
+        
+        this.setGhostSkin(d.getImage());            
+    }    
+    
     public void interact(Entity e){
     }   
     
@@ -38,15 +50,21 @@ public class Block extends Entity{
     public void setType(Material dataToSet) {
         this.data = dataToSet;
         this.health = dataToSet.getDurability();
-    }
-
-    public Rectangle getBounds() {
-        return getLocation().toRectangle(this.data.getImage().getWidth(), this.data.getImage().getHeight()); 
+        setSkin(dataToSet.getImage());
+        
+        if(dataToSet == Material.AIR) {
+            this.b.setActive(false);
+        }else {
+            this.b.setActive(true);
+        }
     }
     
-    public void draw(){
-        Engine.render(getBounds().x, getBounds().y, getType().getImage());
-        drawLighting();
+    public void draw() {       
+        Engine.render(getLocation(), this.getSkin());
+        
+        if(this.getType() == Material.SILVER_ORE) {
+            Engine.renderRectangle(this.getBounds(), Color.RED);
+        }
     }
 
     public void damage(int d) {
@@ -57,21 +75,23 @@ public class Block extends Entity{
             destroy();
         }
     }
-
-    public void destroy(){
-        Sound.blockDamage.play();
+    
+    public void destroy(){ 
+        Material m = data;
         
-        for (int x = 0; x < data.getDropAmount(); x++) {
-            new DropEntity(data.getDropType(), new Location(getLocation().getX() + 0.6 * x, getLocation().getY())).spawn();
+        getLocation().getWorld().setBlockAt(getLocation(), new Block(Material.AIR));
+        
+        for (int x = 0; x < m.getDropAmount(); x++) {
+            new DropEntity(m.getDropType()).spawn(getLocation().clone());
         }
         
       //TODO: Move this to a better place
-        if (data == Material.TNT) {
-            new TNTPrimed(getLocation(), 100, 5).spawn();
+        if (m == Material.TNT) {
+            new TNTPrimed(100, 5).spawn(getLocation());
             return;
         }
         
-        getLocation().getWorld().setBlockAt(getLocation(), new Block(Material.AIR));
+        getLocation().getWorld().lightUpdate();
     }
     
     public String toString() {
@@ -79,5 +99,9 @@ public class Block extends Entity{
         s += getType();
         s += ":" + this.getLocation();
         return s;
+    }
+
+    public void setBody(Body body) {
+        b = body;
     }
 }

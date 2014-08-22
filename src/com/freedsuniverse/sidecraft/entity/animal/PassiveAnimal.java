@@ -12,7 +12,7 @@ public class PassiveAnimal extends Animal {
     private final int COMFORT_ZONE = 5;
     
     public PassiveAnimal(String id, int w, int h, int hp) {
-        super(id, w, h, hp);
+        super(id, w, h, hp, 5.0f);
     }
     
     public void update() {

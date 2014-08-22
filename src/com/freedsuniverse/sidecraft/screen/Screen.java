@@ -12,6 +12,7 @@ public class Screen extends JPanel {
     private static final long serialVersionUID = -4312314981973034251L;
     
     private BufferedImage img = Main.getImage(Settings.MENU_BACKGROUND_TILE);
+    private String prev;
     
     @Override
     public void paintComponent(Graphics g) {
@@ -21,6 +22,18 @@ public class Screen extends JPanel {
             for(int y = 0; y < this.getHeight(); y+=32) {
                 g.drawImage(img, x, y, null);
             }
+        }
+    }
+    
+    public void setPreviousScreen(Screen p) {
+        prev = p.getClass().getName();
+    }
+    
+    public String getPreviousScreen() {
+        if(prev == null) {
+            return Menu.class.getName();
+        } else {
+            return prev;
         }
     }
 }
