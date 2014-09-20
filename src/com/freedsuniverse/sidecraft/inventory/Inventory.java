@@ -7,19 +7,19 @@ import com.freedsuniverse.sidecraft.material.tools.Quality;
 
 public class Inventory {
     private Item[][] contents;
-    
+
     public final static int ROWS = 4;
     public final static int COLUMNS = 5;
-    
+
     public Inventory() {
         contents = new Item[ROWS][COLUMNS];
         contents[0][0] = new Pickaxe(Quality.STONE);
         contents[0][1] = new Pickaxe(Quality.IRON);
         contents[0][2] = new Pickaxe(Quality.SILVER);
     }
-    
+
     public void add(Item type) {
-        for(int y = 0; y < contents.length; y++){
+        for (int y = 0; y < contents.length; y++) {
             for (int x = 0; x < contents[0].length; x++) {
                 if (contents[y][x] != null) {
                     if (contents[y][x].getType() == type.getType()) {
@@ -29,7 +29,7 @@ public class Inventory {
                             if (amount > type.getAmount()) {
                                 contents[y][x].modifyAmount(type.getAmount());
                                 type.modifyAmount(-1 * type.getAmount());
-                            }else {
+                            } else {
                                 contents[y][x].setAmount(amount);
                                 type.modifyAmount(-1 * amount);
                             }
@@ -46,7 +46,7 @@ public class Inventory {
         if (type.getAmount() > 0) {
             for (int y = 0; y < contents.length; y++) {
                 for (int x = 0; x < contents[0].length; x++) {
-                    if (contents[y][x]  == null) {
+                    if (contents[y][x] == null) {
                         setAt(x, y, type);
                         return;
                     }
@@ -76,15 +76,15 @@ public class Inventory {
     }
 
     public int[] getIndex(MaterialStack stack) {
-        for(int y = 0; y < contents.length; y++){
+        for (int y = 0; y < contents.length; y++) {
             for (int x = 0; x < contents[0].length; x++) {
                 if (contents[y][x] != null) {
                     if (contents[y][x].getType().getId() == stack.getType().getId()) {
-                        return new int[] {x, y};
+                        return new int[] { x, y };
                     }
                 }
             }
         }
-        return new int[]{-1, -1};
+        return new int[] { -1, -1 };
     }
 }

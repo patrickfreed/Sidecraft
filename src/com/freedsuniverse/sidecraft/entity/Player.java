@@ -32,7 +32,7 @@ public class Player extends LivingEntity {
 
     private Rectangle rec;
 
-    //private Animation[] animations;
+    // private Animation[] animations;
 
     final double JUMP_HEIGHT = 1.3;
     final int ATTACK_DAMAGE = 1;
@@ -47,34 +47,31 @@ public class Player extends LivingEntity {
     public String world;
 
     enum MovementState {
-        WALKING,
-        JUMPING,
-        FALLING
+        WALKING, JUMPING, FALLING
     }
 
     enum ActionState {
-        IDLE,
-        BUSY
+        IDLE, BUSY
     }
-    
+
     public Player() {
         super("player", 32, 64, 10, 15);
     }
-    
+
     public void spawn(Location l) {
         spawn(l, new EntityInventory(this));
     }
-    
+
     public void spawn(String w) {
         spawn(new Location(0, 1, w));
     }
 
-    public void spawn(Location l, EntityInventory inv) {      
-        super.spawn(l);        
-        
+    public void spawn(Location l, EntityInventory inv) {
+        super.spawn(l);
+
         this.setLocation(l);
         rec = new Rectangle(Main.contentPane.getWidth() / 2 + Settings.BLOCK_SIZE / 2, Main.contentPane.getHeight() / 2 + Settings.BLOCK_SIZE / 2, Settings.BLOCK_SIZE, Settings.BLOCK_SIZE * 2);
-        
+
         oldWheelValue = Mouse.getScrollWheelValue();
 
         toolbar = new Toolbar(inv);
@@ -86,22 +83,24 @@ public class Player extends LivingEntity {
         action = ActionState.IDLE;
         oldAction = action;
     }
-    
-//    private void loadTextures(){
-//        MovementState[] stuff = MovementState.values();
-//        animations = new Animation[stuff.length];
-//        for(int x = 0; x < stuff.length; x++){
-//            animations[x] = new Animation(Animation.read("/player/texture/" + stuff[x].toString().toLowerCase() + "/" + stuff[x].toString().toLowerCase() + ".png", 32, 64), 10);
-//        }
-//        currentAnimation = 0;
-//    }
+
+    // private void loadTextures(){
+    // MovementState[] stuff = MovementState.values();
+    // animations = new Animation[stuff.length];
+    // for(int x = 0; x < stuff.length; x++){
+    // animations[x] = new Animation(Animation.read("/player/texture/" +
+    // stuff[x].toString().toLowerCase() + "/" +
+    // stuff[x].toString().toLowerCase() + ".png", 32, 64), 10);
+    // }
+    // currentAnimation = 0;
+    // }
 
     @Override
     public void update() {
         super.update();
-        
-        if(isAttacking) {            
-            if(System.currentTimeMillis() - this.lastAttack >= this.getAttackSpeed()){
+
+        if (isAttacking) {
+            if (System.currentTimeMillis() - this.lastAttack >= this.getAttackSpeed()) {
                 canDamage = true;
                 isAttacking = false;
             }
@@ -109,111 +108,113 @@ public class Player extends LivingEntity {
 
         oldWheelValue = currentWheelValue;
         currentWheelValue = Mouse.getScrollWheelValue();
-        
+
         this.getLocation().setCoordinates(b.getPosition().x, b.getPosition().y);
         updateInteraction();
         updateToolbar();
         updateMovement();
 
-        if(oldAction != action){
+        if (oldAction != action) {
             oldAction = action;
         }
     }
 
-    private long getAttackSpeed() {       
+    private long getAttackSpeed() {
         return 500;
     }
 
     private void updateMovement() {
-        if(Key.W.isDown() && footContacts > 0) {
+        if (Key.W.isDown() && footContacts > 0) {
             float impulse = 0;
             float intendedV = WALKING_SPEED;
-            
-            //if(footContacts <= 0) {
-            //    intendedV = WALKING_SPEED / 4;
-            //}
-            
+
+            // if(footContacts <= 0) {
+            // intendedV = WALKING_SPEED / 4;
+            // }
+
             float dV = intendedV - this.b.getLinearVelocity().x;
-            
+
             impulse = this.getBody().getMass() * dV;
             this.getBody().applyLinearImpulse(new Vec2(impulse, 0), this.getBody().getWorldCenter());
-            //if(footContacts <= 0) {
-            //    this.b.getLinearVelocity().x = WALKING_SPEED / 4.0f;
-            //}
-            
-            //this.b.getLinearVelocity().x = WALKING_SPEED;
-        }else if(Key.S.isDown() && this.footContacts > 0) {
+            // if(footContacts <= 0) {
+            // this.b.getLinearVelocity().x = WALKING_SPEED / 4.0f;
+            // }
+
+            // this.b.getLinearVelocity().x = WALKING_SPEED;
+        } else if (Key.S.isDown() && this.footContacts > 0) {
             float impulse = 0;
             float intendedV = -WALKING_SPEED;
-            
-            //if(footContacts <= 0) {
-            //    intendedV = WALKING_SPEED / 4;
-            //}
-            
+
+            // if(footContacts <= 0) {
+            // intendedV = WALKING_SPEED / 4;
+            // }
+
             float dV = intendedV - this.b.getLinearVelocity().x;
-            
+
             impulse = this.getBody().getMass() * dV;
             this.getBody().applyLinearImpulse(new Vec2(impulse, 0), this.getBody().getWorldCenter());
         }
-        
-        if(Key.SPACE.toggled() && this.footContacts > 0) {
+
+        if (Key.SPACE.toggled() && this.footContacts > 0) {
             this.b.getLinearVelocity().y = 6.0f;
         }
     }
-    
+
     private void updateToolbar() {
         if (currentWheelValue < oldWheelValue) {
             getToolbar().addToCurrentIndex(1);
         } else if (currentWheelValue > oldWheelValue) {
             getToolbar().addToCurrentIndex(-1);
         } else {
-            if (Key.ONE.isDown()) getToolbar().setCurrentIndex(0);
-            else if (Key.TWO.isDown()) getToolbar().setCurrentIndex(1);
-            else if (Key.THREE.isDown()) getToolbar().setCurrentIndex(2);
-            else if (Key.FOUR.isDown()) getToolbar().setCurrentIndex(3);
-            else if (Key.FIVE.isDown()) getToolbar().setCurrentIndex(4);
+            if (Key.ONE.isDown())
+                getToolbar().setCurrentIndex(0);
+            else if (Key.TWO.isDown())
+                getToolbar().setCurrentIndex(1);
+            else if (Key.THREE.isDown())
+                getToolbar().setCurrentIndex(2);
+            else if (Key.FOUR.isDown())
+                getToolbar().setCurrentIndex(3);
+            else if (Key.FIVE.isDown())
+                getToolbar().setCurrentIndex(4);
         }
     }
 
     private void updateInteraction() {
         if (action != ActionState.BUSY) {
-            
-            if(Key.I.toggled() && oldAction != ActionState.BUSY){
+            if (Key.I.toggled() && oldAction != ActionState.BUSY) {
                 setAction(BUSY);
                 inventory.open();
-            }
-            else if (Mouse.isDown(MouseEvent.BUTTON1)) {
+            } else if (Mouse.isDown(MouseEvent.BUTTON1)) {
                 Location mouseCoords = Mouse.getLocation();
-                
+
                 if (Math.abs(mouseCoords.getX() - getLocation().getX()) <= 4 && Math.abs(mouseCoords.getY() - getLocation().getY()) <= 4) {
-                
-                ArrayList<Entity> es = getLocation().getWorld().getNearbyEntities(mouseCoords, 2);
-                
-                for(Entity e:es) {
-                    if(e != null && !(e instanceof Player) && e.getBounds().contains(Mouse.getPoint())) {
-                        attack(e);
-                        
+
+                    ArrayList<Entity> es = getLocation().getWorld().getNearbyEntities(mouseCoords, 2);
+
+                    for (Entity e : es) {
+                        if (e != null && !(e instanceof Player) && e.getBounds().contains(Mouse.getPoint())) {
+                            attack(e);
+
+                        }
                     }
-                }
                     Block block = getLocation().getWorld().getBlockAt(mouseCoords);
 
                     if (block.getType().getDurability() <= 0) {
                         return;
-                    } 
-                    
+                    }
+
                     attack(getLocation().getWorld().getBlockAt(mouseCoords));
-                 }
-            }
-            else if (Mouse.clicked(MouseEvent.BUTTON3)) {
+                }
+            } else if (Mouse.clicked(MouseEvent.BUTTON3)) {
                 Location mouseCoords = Mouse.getLocation();
                 Block block = getWorld().getBlockAt(mouseCoords);
 
                 if (canPlaceBlock(block)) {
-                    if(getToolbar().getSelectedObj().getType() == Material.WORKBENCH){                
+                    if (getToolbar().getSelectedObj().getType() == Material.WORKBENCH) {
                         getLocation().getWorld().setBlockAt(block.getLocation(), new Workbench());
-                    }else if(getToolbar().getSelectedObj().getType() == Material.TORCH) {
+                    } else if (getToolbar().getSelectedObj().getType() == Material.TORCH) {
                         getLocation().getWorld().setBlockAt(block.getLocation(), new Torch());
-                    }else{       
+                    } else {
                         block.setType(getToolbar().getSelectedObj().getType());
                     }
                     getToolbar().getSelectedObj().setAmount(getToolbar().getSelectedObj().getAmount() - 1);
@@ -221,16 +222,15 @@ public class Player extends LivingEntity {
                     if (getToolbar().getSelectedObj().getAmount() <= 0) {
                         getInventory().setAt(getToolbar().getCurrentIndex(), 0, null);
                     }
-                }else{   
+                } else {
                     block.interact(this);
                 }
             }
-        }else{
+        } else {
             if (Key.I.toggled()) {
                 setAction(IDLE);
                 getInventory().close();
-            }
-            else {
+            } else {
                 getInventory().update();
             }
         }
@@ -239,9 +239,9 @@ public class Player extends LivingEntity {
     public void setAction(int i) {
         oldAction = action;
 
-        if(i == IDLE) {
+        if (i == IDLE) {
             action = ActionState.IDLE;
-        } else if(i == BUSY){
+        } else if (i == BUSY) {
             action = ActionState.BUSY;
         }
     }
@@ -249,24 +249,25 @@ public class Player extends LivingEntity {
     @Override
     public void draw() {
         super.draw();
-        
+
         Item itemInHand = getInventory().getAt(getToolbar().getCurrentIndex(), 0);
 
-        if(itemInHand != null){
-            //Engine.render(new Rectangle((int)getBounds().getMaxX(), getBounds().y, 16, 16), itemInHand.getType().getImage());
+        if (itemInHand != null) {
+            // Engine.render(new Rectangle((int)getBounds().getMaxX(),
+            // getBounds().y, 16, 16), itemInHand.getType().getImage());
         }
 
         Location mouseCoords = Mouse.getLocation();
 
-        if(!getInventory().isOpen()) {
+        if (!getInventory().isOpen()) {
             toolbar.draw();
         } else {
             getInventory().draw();
         }
 
-        if(action != ActionState.BUSY) {
+        if (action != ActionState.BUSY) {
             if (Math.abs(mouseCoords.getX() - getLocation().getX()) <= 4 && Math.abs(mouseCoords.getY() - getLocation().getY()) <= 4)
-                if(!Main.getGame().isPaused())
+                if (!Main.getGame().isPaused())
                     Engine.render(mouseCoords.getWorld().getBlockAt(mouseCoords).getLocation(), Main.selectionTile);
         }
     }
@@ -285,44 +286,44 @@ public class Player extends LivingEntity {
     }
 
     private boolean canPlaceBlock(Block block) {
-        return getToolbar().getSelectedObj() != null 
-                && block.getType() == Material.AIR && Math.abs(block.getLocation().getX() - getLocation().getX()) <= 4 
-                && Math.abs(block.getLocation().getY() - getLocation().getY()) <= 4
-                && !(getToolbar().getSelectedObj() instanceof Tool);
+        return getToolbar().getSelectedObj() != null && block.getType() == Material.AIR && Math.abs(block.getLocation().getX() - getLocation().getX()) <= 4 && Math.abs(block.getLocation().getY() - getLocation().getY()) <= 4 && !(getToolbar().getSelectedObj() instanceof Tool);
     }
 
-//    @SuppressWarnings("unused")
-//    public BufferedImage getSkin1() {
-//        if(this.b.getLinearVelocity().x == 0){
-//            if(false) {
-//                AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
-//                tx.translate(-this.texture.getWidth(null), 0);
-//                AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
-//                return op.filter(this.texture, null); 
-//            }
-//            return this.texture;
-//        }else{
-//            if(this.b.getLinearVelocity().x > 0){
-//                return animations[currentAnimation].getSlide();
-//            }else {
-//                AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
-//                tx.translate(-animations[currentAnimation].getSlide().getWidth(null), 0);
-//                AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
-//                return op.filter(animations[currentAnimation].getSlide(), null);           
-//            }
-//        }
-//    }
+    // @SuppressWarnings("unused")
+    // public BufferedImage getSkin1() {
+    // if(this.b.getLinearVelocity().x == 0){
+    // if(false) {
+    // AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
+    // tx.translate(-this.texture.getWidth(null), 0);
+    // AffineTransformOp op = new AffineTransformOp(tx,
+    // AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+    // return op.filter(this.texture, null);
+    // }
+    // return this.texture;
+    // }else{
+    // if(this.b.getLinearVelocity().x > 0){
+    // return animations[currentAnimation].getSlide();
+    // }else {
+    // AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
+    // tx.translate(-animations[currentAnimation].getSlide().getWidth(null), 0);
+    // AffineTransformOp op = new AffineTransformOp(tx,
+    // AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+    // return op.filter(animations[currentAnimation].getSlide(), null);
+    // }
+    // }
+    // }
 
-    public void attack(Entity e){
-        if(!canDamage) return;
+    public void attack(Entity e) {
+        if (!canDamage)
+            return;
 
-        if(e instanceof Block){
+        if (e instanceof Block) {
             Block b = (Block) e;
             b.damage(getDamage(e));
             isAttacking = true;
             lastAttack = System.currentTimeMillis();
             canDamage = false;
-        }else if(e instanceof LivingEntity) {
+        } else if (e instanceof LivingEntity) {
             ((LivingEntity) e).damage(2);
             isAttacking = true;
             lastAttack = System.currentTimeMillis();
@@ -332,8 +333,8 @@ public class Player extends LivingEntity {
 
     private int getDamage(Entity e) {
         Item mat = this.getToolbar().getSelectedObj();
-        
-        if(mat != null){
+
+        if (mat != null) {
             return mat.getDamage(e);
         }
         return ATTACK_DAMAGE;
@@ -343,9 +344,9 @@ public class Player extends LivingEntity {
     public Rectangle getBounds() {
         return rec;
     }
-    
+
     @Override
     public void destroy() {
-        //TODO: implement
+        // TODO: implement
     }
 }

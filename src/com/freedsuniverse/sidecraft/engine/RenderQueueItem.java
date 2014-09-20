@@ -12,36 +12,36 @@ public class RenderQueueItem {
     private Rectangle rec;
     private int x, y;
     private Color color;
-    
+
     private final int RECTANGLE = 0, IMAGE = 1, STRING = 2;
-    
+
     private int mode;
-    
-    public RenderQueueItem(Rectangle r, Color c){
+
+    public RenderQueueItem(Rectangle r, Color c) {
         this.rec = r;
         mode = RECTANGLE;
-        color = c;            
+        color = c;
     }
-    
-    public RenderQueueItem(String msg, int x, int y, Color c){
+
+    public RenderQueueItem(String msg, int x, int y, Color c) {
         this.x = x;
         this.y = y;
         message = msg;
         color = c;
         mode = STRING;
     }
-    
-    public RenderQueueItem(int x, int y, BufferedImage img){
+
+    public RenderQueueItem(int x, int y, BufferedImage img) {
         this(img, new Rectangle(x, y, img.getWidth(), img.getHeight()));
     }
-    
-    public RenderQueueItem(BufferedImage img, int x, int y, int width, int height){
+
+    public RenderQueueItem(BufferedImage img, int x, int y, int width, int height) {
         this.rec = new Rectangle(x, y, width, height);
         this.img = img;
         mode = IMAGE;
     }
-    
-    public RenderQueueItem(BufferedImage img, Rectangle rec){
+
+    public RenderQueueItem(BufferedImage img, Rectangle rec) {
         this.rec = rec;
         this.img = img;
         mode = IMAGE;
@@ -51,12 +51,12 @@ public class RenderQueueItem {
         this(i, location.toRectangle(i.getWidth(), i.getHeight()));
     }
 
-    public void draw(){
-        if(mode == RECTANGLE){
+    public void draw() {
+        if (mode == RECTANGLE) {
             Engine.renderRectangle(rec, color);
-        }else if(mode == STRING){
+        } else if (mode == STRING) {
             Engine.renderString(message, x, y, this.color);
-        }else {
+        } else {
             Engine.render(rec, img);
         }
     }

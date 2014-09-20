@@ -1,6 +1,5 @@
 package com.freedsuniverse.sidecraft.entity.animal;
 
-import com.freedsuniverse.sidecraft.entity.Animal;
 import com.freedsuniverse.sidecraft.material.Material;
 import com.freedsuniverse.sidecraft.material.MaterialStack;
 

@@ -11,9 +11,9 @@ public class Explosion {
         int centerY = (int) loc.getY();
         int r = ((int) radius) + 1;
         float hyp = radius * radius;
-        
-        //TODO: improver performance
-        
+
+        // TODO: improver performance
+
         for (int x = -r; x <= r; x++) {
             for (int y = -r; y <= r; y++) {
                 if ((x * x) + (y * y) <= hyp) {

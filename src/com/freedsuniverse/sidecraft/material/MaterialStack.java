@@ -6,7 +6,7 @@ import java.awt.Rectangle;
 import com.freedsuniverse.sidecraft.engine.Engine;
 import com.freedsuniverse.sidecraft.engine.RenderQueueItem;
 
-public class MaterialStack extends Item{
+public class MaterialStack extends Item {
     public final static int DEFAULT_STACK_SIZE = 64, Y_OFFSET = 30, X_OFFSET = 20;
 
     public MaterialStack(Material t, int am) {
@@ -20,23 +20,23 @@ public class MaterialStack extends Item{
 
     public void draw(int x, int y, boolean queue) {
         RenderQueueItem i = new RenderQueueItem(x, y, getType().getImage());
-        if(queue){
+        if (queue) {
             Engine.addQueueItem(i);
-        }else{
+        } else {
             super.draw(new Rectangle(x, y), false);
             Engine.renderString(String.valueOf(getAmount()), x + X_OFFSET, Y_OFFSET + y, Color.WHITE);
         }
-    } 
+    }
 
     public void draw(Rectangle box, boolean queue) {
         RenderQueueItem texture = new RenderQueueItem(getImage(), box);
         RenderQueueItem text = new RenderQueueItem(String.valueOf(getAmount()), box.x + X_OFFSET, box.y + Y_OFFSET, Color.white);
-        if(queue){
+        if (queue) {
             Engine.addQueueItem(texture);
             Engine.addQueueItem(text);
-        }else{
+        } else {
             super.draw(box, false);
             Engine.render(text);
-        } 
+        }
     }
 }

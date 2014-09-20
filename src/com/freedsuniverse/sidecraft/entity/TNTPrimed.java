@@ -21,14 +21,14 @@ public class TNTPrimed extends Entity {
 
         bd.type = BodyType.DYNAMIC;
         fd.friction = 2;
-        
+
         PolygonShape ps = new PolygonShape();
         ps.setAsBox(0.5f, 0.5f);
-        
+
         fd.shape = ps;
-        
+
         this.setSkin(Material.TNT.getImage());
-        
+
         width = Settings.BLOCK_SIZE;
         height = Settings.BLOCK_SIZE;
 
@@ -41,9 +41,9 @@ public class TNTPrimed extends Entity {
         this.b = getLocation().getWorld().preRegisterEntity(this);
     }
 
-    public void update() {        
+    public void update() {
         super.update();
-        
+
         --fuseTicks;
 
         if (fuseTicks <= 0) {
@@ -55,11 +55,11 @@ public class TNTPrimed extends Entity {
 
     public void draw() {
         if (fuseTicks % 10 < 5) {
-        	Engine.render(getLocation(), height, width, Material.TNT.getImage());
+            Engine.render(getLocation(), height, width, Material.TNT.getImage());
         } else {
-                Engine.graphics.setColor(Color.WHITE);
-                int[] locs = getLocation().toArray();
-                Engine.graphics.fillRect(locs[0] - width / 2, locs[1] - height / 2, width, height);
+            Engine.graphics.setColor(Color.WHITE);
+            int[] locs = getLocation().toArray();
+            Engine.graphics.fillRect(locs[0] - width / 2, locs[1] - height / 2, width, height);
         }
     }
 

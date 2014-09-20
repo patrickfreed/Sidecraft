@@ -13,7 +13,7 @@ public class Toolbar {
     private int currentIndex;
 
     private BufferedImage tile;
-    
+
     private int x = 315, y = 400;
 
     final int Y = 407, WIDTH = 29, HEIGHT = 29;
@@ -21,7 +21,7 @@ public class Toolbar {
     private Rectangle[] boxes;
 
     private Inventory i;
-    
+
     public Toolbar(Inventory i) {
         this.i = i;
         this.currentIndex = 0;
@@ -32,12 +32,12 @@ public class Toolbar {
         tile = Main.toolbarSelectionTile;
     }
 
-    private void createRectangles(){
-        for (int x = 0; x < 5; x++){
+    private void createRectangles() {
+        for (int x = 0; x < 5; x++) {
             boxes[x] = new Rectangle(this.x + 7 + (38 * x), this.y + 7, WIDTH, HEIGHT);
         }
     }
-    
+
     public Item getSelectedObj() {
         return i.getAt(currentIndex, 0);
     }
@@ -50,15 +50,13 @@ public class Toolbar {
         if (index == 1) {
             if (currentIndex <= 3) {
                 currentIndex += 1;
-            }
-            else {
+            } else {
                 currentIndex = 0;
             }
-        }
-        else {
+        } else {
             if (currentIndex > 0) {
                 currentIndex -= 1;
-            }else{
+            } else {
                 currentIndex = 4;
             }
         }
@@ -82,9 +80,8 @@ public class Toolbar {
                 }
 
                 if (item.getAmount() > 0)
-                    Engine.addQueueItem(new RenderQueueItem(String.valueOf(i.getAt(x, 0).getAmount()), (int)boxes[x].getCenterX() + 5, (int)boxes[x].getCenterY() - 1, Color.WHITE));
-            }
-            else {
+                    Engine.addQueueItem(new RenderQueueItem(String.valueOf(i.getAt(x, 0).getAmount()), (int) boxes[x].getCenterX() + 5, (int) boxes[x].getCenterY() - 1, Color.WHITE));
+            } else {
                 if (x == currentIndex) {
                     Engine.addQueueItem(new RenderQueueItem(boxes[x].x - 3, boxes[x].y - 3, this.tile));
                 }

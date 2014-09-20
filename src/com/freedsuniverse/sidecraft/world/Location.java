@@ -8,13 +8,16 @@ import com.freedsuniverse.sidecraft.Settings;
 import com.freedsuniverse.sidecraft.Sidecraft;
 
 public class Location {
-    private double x, y;
-    public String world;
-    
+    private static Location playerLoc;
+
+    private double x;
+    private double y;
+    private String world;
+
     public Location(double x, double y) {
         this.x = x;
         this.y = y;
-        this.world = Main.getGame().playerLoc.getWorldName();
+        this.world = playerLoc.getWorldName();
     }
 
     public Location(double x, double y, String world) {
@@ -25,20 +28,26 @@ public class Location {
 
     public static Location valueOf(Rectangle rect) {
         return valueOf(rect.getX(), rect.getY());
-    }   
+    }
+
+    public static void setPlayerLocation(Location l) {
+        playerLoc = l;
+    }
 
     public int[] toArray() {
-        if(this.getWorld().getPlayer() == null) return null;
-        
-        int x = (int) ((this.x - Main.getGame().playerLoc.getX()) * Settings.BLOCK_SIZE + Sidecraft.getCenterBound().getX() + Settings.BLOCK_SIZE / 2.0);
+        if (this.getWorld().getPlayer() == null)
+            return null;
+
+        int x = (int) ((this.x - playerLoc.getX()) * Settings.BLOCK_SIZE + Sidecraft.getCenterBound().getX() + Settings.BLOCK_SIZE / 2.0);
         int y = (int) (Sidecraft.getCenterBound().getY() + Settings.BLOCK_SIZE / 2.0 - ((this.y - getWorld().getPlayer().getLocation().getY()) * Settings.BLOCK_SIZE));
 
-        return new int[]{x ,y};
+        return new int[] { x, y };
     }
 
     public Rectangle toRectangle(int width, int height) {
-        if(this.getWorld().getPlayer() == null) return null;
-        
+        if (this.getWorld().getPlayer() == null)
+            return null;
+
         int[] i = toArray();
 
         return new Rectangle(i[0] - Settings.BLOCK_SIZE / 2, i[1] - Settings.BLOCK_SIZE / 2, width, height);
@@ -62,7 +71,7 @@ public class Location {
     }
 
     public void modifyX(double amount) {
-        this.x =  x + amount;
+        this.x = x + amount;
     }
 
     public void modifyY(double amount) {
@@ -85,42 +94,42 @@ public class Location {
     public boolean equals(Location l) {
         return l.getX() == this.x && l.getY() == this.y && l.getWorldName().equalsIgnoreCase(this.world);
     }
-    
+
     public boolean intersects(Location otherLocation) {
-        if(otherLocation.getWorld().getName().equals(world)){
+        if (otherLocation.getWorld().getName().equals(world)) {
             return Math.floor(this.getX()) - Math.floor(otherLocation.getX()) == 0 && Math.floor(this.getY()) - Math.floor(otherLocation.getY()) == 0;
         }
         return false;
     }
 
-    public Block getBlockAt(){
+    public Block getBlockAt() {
         return getWorld().getBlockAt(this);
     }
-    
+
     public String getWorldName() {
         return world;
     }
-    
+
     public GameWorld getWorld() {
-        return Main.getGame().worlds.get(world);
+        return Main.getGame().getWorlds().get(world);
     }
-    
+
     public String getId() {
         return (int) Math.round(x) + "," + (int) Math.round(y);
     }
-    
+
     public Location clone() {
         return new Location(x, y, world);
     }
-    
+
     public static Location valueOf(double d, double e) {
-        double x = (d - Sidecraft.getCenterBound().getX()) / Settings.BLOCK_SIZE + Main.getGame().playerLoc.getX();
-        double y = (e - Sidecraft.getCenterBound().getY()) / -Settings.BLOCK_SIZE + Main.getGame().playerLoc.getY();
+        double x = (d - Sidecraft.getCenterBound().getX()) / Settings.BLOCK_SIZE + playerLoc.getX();
+        double y = (e - Sidecraft.getCenterBound().getY()) / -Settings.BLOCK_SIZE + playerLoc.getY();
 
         return new Location(x, y);
     }
 
     public double getDistance(Location location) {
         return Math.sqrt(Math.pow(x - location.getX(), 2) + Math.pow(y - location.getY(), 2));
-    } 
+    }
 }

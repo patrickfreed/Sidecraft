@@ -18,7 +18,7 @@ public class Menu extends Screen {
         setBackground(Color.LIGHT_GRAY);
         SpringLayout springLayout = new SpringLayout();
         setLayout(springLayout);
-        
+
         JButton startGame = new JButton("Start Game");
         springLayout.putConstraint(SpringLayout.SOUTH, startGame, -149, SpringLayout.SOUTH, this);
         startGame.addActionListener(new ActionListener() {
@@ -27,7 +27,7 @@ public class Menu extends Screen {
             }
         });
         add(startGame);
-        
+
         JLabel label = new JLabel("");
         springLayout.putConstraint(SpringLayout.WEST, startGame, 150, SpringLayout.WEST, label);
         springLayout.putConstraint(SpringLayout.EAST, startGame, -150, SpringLayout.EAST, label);
@@ -39,7 +39,7 @@ public class Menu extends Screen {
         label.setMinimumSize(label.getSize());
         label.setIcon(new ImageIcon(Menu.class.getResource("/misc/menu/background.png")));
         add(label);
-        
+
         JButton btnSettings = new JButton("Settings");
         btnSettings.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
@@ -50,5 +50,5 @@ public class Menu extends Screen {
         springLayout.putConstraint(SpringLayout.WEST, btnSettings, 362, SpringLayout.WEST, this);
         springLayout.putConstraint(SpringLayout.EAST, btnSettings, -362, SpringLayout.EAST, this);
         add(btnSettings);
-    } 
+    }
 }
