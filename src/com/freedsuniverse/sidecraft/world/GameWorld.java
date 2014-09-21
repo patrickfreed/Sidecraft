@@ -149,7 +149,7 @@ public class GameWorld extends World {
             }
         }
 
-        this.step(1.0f / 144.0f, 3, 3);
+        this.step(1.0f / Settings.REFRESH_RATE, 3, 3);
         updateBlocks();
         updateEntities();
         uLight = false;

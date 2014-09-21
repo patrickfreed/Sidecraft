@@ -20,8 +20,8 @@ import com.freedsuniverse.sidecraft.input.Mouse;
 import com.freedsuniverse.sidecraft.material.CraftingRecipe;
 import com.freedsuniverse.sidecraft.material.Material;
 import com.freedsuniverse.sidecraft.screen.Paused;
-import com.freedsuniverse.sidecraft.world.Location;
 import com.freedsuniverse.sidecraft.world.GameWorld;
+import com.freedsuniverse.sidecraft.world.Location;
 
 public class Sidecraft extends Canvas implements Runnable {
     private static final long serialVersionUID = 1L;
@@ -61,7 +61,7 @@ public class Sidecraft extends Canvas implements Runnable {
         this.addMouseWheelListener(i);
         this.requestFocus();
     }
-
+    
     public void start() {
         if (isRunning)
             return;
@@ -114,7 +114,7 @@ public class Sidecraft extends Canvas implements Runnable {
         long lastTimer1 = System.currentTimeMillis();
 
         double unprocessed = 0;
-        double nsPerTick = 1000000000.0 / 144.0;
+        double nsPerTick = 1000000000.0 / Settings.REFRESH_RATE;
 
         int frames = 0;
         int ticks = 0;
