@@ -30,7 +30,7 @@ import com.freedsuniverse.sidecraft.world.gen.FlatNoiseGen;
 import com.freedsuniverse.sidecraft.world.gen.WorldGen;
 
 public class GameWorld extends World {
-
+    
     private final static int LIGHTMAP_DIMENSION = 32 * 60;
     private final static int UPDATE_RANGE = 32;
     private final static long DAY_LENGTH = 48000;
@@ -100,9 +100,13 @@ public class GameWorld extends World {
         System.out.println("Day " + day + " dawns.");
     }
 
-    public void update() {
-        if (p == null)
+    public void update() {       
+        if (p == null) {
             System.err.println("World  '" + this.getName() + "' is being updated without a player.");
+            return;
+        }
+        
+        Location l = p.getLocation();
 
         long time = System.currentTimeMillis() - lastMorning;
         int stage1 = stage;
@@ -128,7 +132,7 @@ public class GameWorld extends World {
         }
 
         if (Key.B.toggled()) {
-            new DebugEntity(true, 45).spawn(p.getLocation().modify(1, 4));
+            new DebugEntity(true, 45).spawn(l.modify(1, 4));
             // new Pig().spawn(p.getLocation().modify(1, 2));
             // lightUpdate();
             // path = this.getPath(p.getLocation(),
@@ -140,16 +144,16 @@ public class GameWorld extends World {
         }
 
         if (!lighting()) {
-            Location loc = p.getLocation();
-            double xdist = Math.abs(loc.getX() - lightLoc.getX());
-            double ydist = Math.abs(loc.getY() - lightLoc.getY());
+            double xdist = Math.abs(l.getX() - lightLoc.getX());
+            double ydist = Math.abs(l.getY() - lightLoc.getY());
 
             if (xdist * Settings.BLOCK_SIZE >= LIGHTMAP_DIMENSION - Main.getPaneWidth() || xdist <= 13 || ydist <= 13 || ydist * Settings.BLOCK_SIZE >= LIGHTMAP_DIMENSION - Main.getPaneWidth()) {
                 lightUpdate();
             }
         }
-
-        this.step(1.0f / Settings.REFRESH_RATE, 3, 3);
+        
+        generateWorld((int) l.getX(), (int) l.getY());
+        step(1.0f / Settings.REFRESH_RATE, 3, 3);
         updateBlocks();
         updateEntities();
         uLight = false;
@@ -172,7 +176,6 @@ public class GameWorld extends World {
                 getBlockAt((int) (p.getLocation().getX() - UPDATE_RANGE / 2) + x, (int) (p.getLocation().getY() - UPDATE_RANGE / 2) + y).update();
             }
         }
-
     }
 
     public void updateEntities() {
@@ -182,6 +185,8 @@ public class GameWorld extends World {
             registerEntity(e);
         }
 
+        // no longer necessary for blocks, will be necessary for entities later. 
+        // preRegister is going to need some major tweaking
         for (Entity e : toCreate) {
             Body body = this.createBody(e.getBd());
 
@@ -250,8 +255,9 @@ public class GameWorld extends World {
             }
         }
 
-        if (renderLight)
+        if (renderLight) {
             Engine.addQueueItem(new RenderQueueItem(lightLoc, lightMap));
+        }
 
         if (drawMap) {
             Engine.addQueueItem(new RenderQueueItem(new Rectangle(0, 0, Main.getPaneWidth(), Main.getPaneHeight()), Color.blue));
@@ -348,11 +354,10 @@ public class GameWorld extends World {
         return oreCount;
     }
 
-    public void generateWorld() {
-        for (int y = 0; y < 50; y++) {
-            for (int x = 0; x < 50; x++) {
-                getBlockAt(x, y);
-                ;
+    public void generateWorld(int x0, int y0) {
+        for (int y = -UPDATE_RANGE; y < UPDATE_RANGE; y++) {
+            for (int x = -UPDATE_RANGE; x < UPDATE_RANGE; x++) {
+                getBlockAt(x0 + x, y0 + y);
             }
         }
     }
@@ -422,11 +427,7 @@ public class GameWorld extends World {
     }
 
     public String toString() {
-        String s = "";
-
-        s += "World:{" + getName() + "," + getSeed() + "}";
-
-        return s;
+        return "World:{" + getName() + "," + getSeed() + "}";
     }
 
     public ArrayList<Block> getNearbyBlocks(Location loc, int radius) {
@@ -490,16 +491,16 @@ public class GameWorld extends World {
     public BufferedImage getMap() {
         BufferedImage i = new BufferedImage(Main.getPaneWidth(), Main.getPaneHeight(), BufferedImage.TYPE_INT_ARGB);
         Graphics g = i.getGraphics();
-        int r = 200;
+        int r = 100;
 
         int size = i.getWidth() / r;
         Location l = p.getLocation().modify(-r / 2, r / 4);
         l.setX(Math.floor(l.getX()));
         l.setY(Math.ceil(l.getY()));
+        
         HashMap<Material, Image> scaled = new HashMap<Material, Image>();
-
         Material[] ms = Material.values();
-
+        
         for (Material m : ms) {
             scaled.put(m, Engine.scaleImage(m.getImage(), size, size));
         }

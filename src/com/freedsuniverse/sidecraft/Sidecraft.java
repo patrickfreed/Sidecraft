@@ -84,7 +84,7 @@ public class Sidecraft extends Canvas implements Runnable {
         // music.play();
 
         GameWorld world = new GameWorld(name);
-        world.generateWorld();
+        world.generateWorld(0, 0);
         worlds.put(world.getName(), world);
 
         player = new Player();
