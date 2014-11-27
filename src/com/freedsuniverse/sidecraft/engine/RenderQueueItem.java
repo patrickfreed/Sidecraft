@@ -7,20 +7,21 @@ import java.awt.image.BufferedImage;
 import com.freedsuniverse.sidecraft.world.Location;
 
 public class RenderQueueItem {
-	private static final int RECTANGLE = 0;
+
+    private static final int RECTANGLE = 0;
     private static final int IMAGE = 1;
     private static final int STRING = 2;
-	
-	private BufferedImage img;
-    
+
+    private BufferedImage img;
+
     private String message;
-    
+
     private Rectangle rec;
-    
+
     private int x;
     private int y;
     private int mode;
-    
+
     private Color color;
 
     public RenderQueueItem(Rectangle r, Color c) {

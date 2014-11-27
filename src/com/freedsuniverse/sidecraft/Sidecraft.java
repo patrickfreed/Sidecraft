@@ -24,14 +24,14 @@ import com.freedsuniverse.sidecraft.world.GameWorld;
 import com.freedsuniverse.sidecraft.world.Location;
 
 public class Sidecraft extends Canvas implements Runnable {
-    
-	private static final long serialVersionUID = 1L;
-	private static final int SKY_COLOR = 220;
-	
-	private static Rectangle center;
-    
+
+    private static final long serialVersionUID = 1L;
+    private static final int SKY_COLOR = 220;
+
+    private static Rectangle center;
+
     private static Graphics graphics;
-    
+
     private Player player;
 
     private int frames;
@@ -65,7 +65,7 @@ public class Sidecraft extends Canvas implements Runnable {
         this.addMouseWheelListener(i);
         this.requestFocus();
     }
-    
+
     public void start() {
         if (isRunning)
             return;
@@ -295,9 +295,9 @@ public class Sidecraft extends Canvas implements Runnable {
     public static Rectangle getCenterBound() {
         return center;
     }
-    
+
     public static Graphics graphics() {
-    	return Sidecraft.graphics;
+        return Sidecraft.graphics;
     }
 
     public static BufferedImage getImage(String file) {

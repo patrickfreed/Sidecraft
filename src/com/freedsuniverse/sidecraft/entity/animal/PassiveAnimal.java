@@ -6,9 +6,9 @@ import com.freedsuniverse.sidecraft.entity.Entity;
 import com.freedsuniverse.sidecraft.entity.LivingEntity;
 
 public class PassiveAnimal extends Animal {
-	
-	private static final int COMFORT_ZONE = 5;
-	
+
+    private static final int COMFORT_ZONE = 5;
+
     private LivingEntity target;
 
     public PassiveAnimal(String id, int w, int h, int hp) {

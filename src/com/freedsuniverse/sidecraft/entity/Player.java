@@ -24,12 +24,13 @@ import com.freedsuniverse.sidecraft.world.active.Torch;
 import com.freedsuniverse.sidecraft.world.active.Workbench;
 
 public class Player extends LivingEntity {
-    private final static int ATTACK_DAMAGE = 1;	
-	private final static float WALKING_SPEED = 3.0f;
+
+    private final static int ATTACK_DAMAGE = 1;
+    private final static float WALKING_SPEED = 3.0f;
     private final static long ATTACK_SPEED = 500;
-    
+
     private Toolbar toolbar;
-    
+
     private EntityInventory inventory;
 
     private ActionState action;
@@ -199,7 +200,7 @@ public class Player extends LivingEntity {
                     Block block = getLocation().getWorld().getBlockAt(mouseCoords);
 
                     if (block.getType().getDurability() > 0) {
-                    	attack(getLocation().getWorld().getBlockAt(mouseCoords));
+                        attack(getLocation().getWorld().getBlockAt(mouseCoords));
                     }
                 }
             } else if (Mouse.clicked(MouseEvent.BUTTON3)) {
@@ -278,7 +279,8 @@ public class Player extends LivingEntity {
     }
 
     private boolean canPlaceBlock(Block block) {
-        return getToolbar().getSelectedObj() != null && block.getType() == Material.AIR && Math.abs(block.getLocation().getX() - getLocation().getX()) <= 4 && Math.abs(block.getLocation().getY() - getLocation().getY()) <= 4 && !(getToolbar().getSelectedObj() instanceof Tool);
+        return getToolbar().getSelectedObj() != null && block.getType() == Material.AIR && Math.abs(block.getLocation().getX() - getLocation().getX()) <= 4
+                && Math.abs(block.getLocation().getY() - getLocation().getY()) <= 4 && !(getToolbar().getSelectedObj() instanceof Tool);
     }
 
     // @SuppressWarnings("unused")
