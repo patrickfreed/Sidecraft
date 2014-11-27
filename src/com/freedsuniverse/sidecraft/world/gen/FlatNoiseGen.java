@@ -9,23 +9,21 @@ import net.royawesome.jlibnoise.Noise;
 import net.royawesome.jlibnoise.NoiseQuality;
 
 public class FlatNoiseGen extends WorldGen {
-
     public static final Material GRASS = Material.GRASS;
     public static final Material DIRT = Material.DIRT;
     public static final Material STONE = Material.STONE;
     public static final Material AIR = Material.AIR;
 
-    public double threshold = 0.0;
-    public double scale = 16.0;
-    public int surface = 10;
-    public int lower = -10;
-    public Random rand;
-    /** Random used for population */
-    public Random pRnd = new Random();
+    private double threshold = 0.0;
+    private double scale = 16.0;
+    
+    private int surface = 10;
+    private int lower = -10;
+    
+    private Random pRnd = new Random();
 
     public FlatNoiseGen() {
         super(new Random().nextInt(10000000 - 1000000) + 1000000);
-        rand = new Random(getSeed());
     }
 
     public double noise(int x, int y) {
@@ -51,6 +49,7 @@ public class FlatNoiseGen extends WorldGen {
             return AIR;
         }
         // hard limit
+        
         double d = noise(x, y);
         if (y > surface) {
             int p = y - surface;
@@ -64,8 +63,7 @@ public class FlatNoiseGen extends WorldGen {
             Material id = getRawBlock(x, y + 1);
             if (id == AIR) {
                 return GRASS;
-            }
-            if (id == GRASS) {
+            } else if (id == GRASS) {
                 return DIRT;
             }
             return STONE;

@@ -24,12 +24,12 @@ public class CollisionListener implements ContactListener {
 
         if (a.m_isSensor && a.m_userData != null && a.getUserData().equals(FOOT_SENSOR)) {
             LivingEntity e = (LivingEntity) a.getBody().getUserData();
-            e.footContacts += 1;
+            e.setFootContacts(e.getFootContacts() + 1);
         }
 
         if (b.m_isSensor && b.m_userData != null && b.m_userData.equals(FOOT_SENSOR)) {
             LivingEntity e = (LivingEntity) b.getBody().getUserData();
-            e.footContacts += 1;
+            e.setFootContacts(e.getFootContacts() + 1);
         }
     }
 
@@ -40,12 +40,12 @@ public class CollisionListener implements ContactListener {
 
         if (a.m_isSensor && a.m_userData != null && a.m_userData.equals(FOOT_SENSOR)) {
             LivingEntity e = (LivingEntity) a.getBody().getUserData();
-            e.footContacts -= 1;
+            e.setFootContacts(e.getFootContacts() - 1);
         }
 
         if (b.m_isSensor && b.m_userData != null && b.m_userData.equals(FOOT_SENSOR)) {
             LivingEntity e = (LivingEntity) b.getBody().getUserData();
-            e.footContacts -= 1;
+            e.setFootContacts(e.getFootContacts() - 1);
         }
     }
 

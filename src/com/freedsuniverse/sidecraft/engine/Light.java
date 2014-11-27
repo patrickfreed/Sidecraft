@@ -3,7 +3,10 @@ package com.freedsuniverse.sidecraft.engine;
 import java.awt.Color;
 
 public class Light {
-    public static final Color DARK = new Color(0, 0, 0, 255), WHITE = new Color(0, 0, 0, 255), NOTHING = new Color(0, 0, 0, 0);
+    
+	public static final Color DARK = new Color(0, 0, 0, 255);
+	public static final Color WHITE = new Color(0, 0, 0, 255); 
+	public static final Color NOTHING = new Color(0, 0, 0, 0);
 
     private Color c;
 

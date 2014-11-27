@@ -12,7 +12,9 @@ import com.freedsuniverse.sidecraft.world.Explosion;
 import com.freedsuniverse.sidecraft.world.Location;
 
 public class TNTPrimed extends Entity {
-    private int width, height, fuseTicks;
+    private int width;
+    private int height;
+    private int fuseTicks;
 
     private float power;
 
@@ -57,9 +59,9 @@ public class TNTPrimed extends Entity {
         if (fuseTicks % 10 < 5) {
             Engine.render(getLocation(), height, width, Material.TNT.getImage());
         } else {
-            Engine.graphics.setColor(Color.WHITE);
+            Engine.getGraphics().setColor(Color.WHITE);
             int[] locs = getLocation().toArray();
-            Engine.graphics.fillRect(locs[0] - width / 2, locs[1] - height / 2, width, height);
+            Engine.getGraphics().fillRect(locs[0] - width / 2, locs[1] - height / 2, width, height);
         }
     }
 

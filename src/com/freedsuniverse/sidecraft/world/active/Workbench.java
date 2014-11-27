@@ -21,13 +21,13 @@ import com.freedsuniverse.sidecraft.material.MaterialStack;
 import com.freedsuniverse.sidecraft.world.Block;
 
 public class Workbench extends Block {
-    private int x;
+    private static final int X_DIFF = 13;
+    private static final int Y_DIFF = 254;
+	
+	private int x;
     private int y;
 
     private Rectangle outputBox;
-
-    private static final int X_DIFF = 13;
-    private static final int Y_DIFF = 254;
 
     private boolean open = false;
 
@@ -42,15 +42,17 @@ public class Workbench extends Block {
 
     @Override
     public void interact(Entity e) {
-        if (!open) {
-            ((Player) e).setAction(1);
+        if (!(e instanceof Player)) return;
+    	
+    	if (!open) {
+            ((Player) e).setAction(Player.ActionState.BUSY);
             x = Main.getGame().getWidth() / 2 - Main.inventoryTile.getWidth() / 2;
             y = Main.getGame().getHeight() / 2 - Main.inventoryTile.getHeight() / 2;
             outputBox = new Rectangle(x + Main.workbenchTile.getWidth() - 49, y + 53, 31, 31);
             outputSlot = new Slot(null, outputBox);
             initiateBench();
         } else {
-            getLocation().getWorld().getPlayer().setAction(0);
+            getLocation().getWorld().getPlayer().setAction(Player.ActionState.IDLE);
 
             for (int x = 0; x < craftingArea.length; x++) {
                 for (int y = 0; y < craftingArea[0].length; y++) {

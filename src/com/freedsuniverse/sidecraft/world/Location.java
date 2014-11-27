@@ -12,6 +12,7 @@ public class Location {
 
     private double x;
     private double y;
+    
     private String world;
 
     public Location(double x, double y) {

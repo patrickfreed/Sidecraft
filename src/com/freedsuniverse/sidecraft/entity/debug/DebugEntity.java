@@ -10,8 +10,9 @@ import org.jbox2d.collision.shapes.PolygonShape;
 import com.freedsuniverse.sidecraft.entity.Entity;
 
 public class DebugEntity extends Entity {
-
+	
     private float r;
+    
     private boolean b;
 
     public DebugEntity(boolean box, float r) {

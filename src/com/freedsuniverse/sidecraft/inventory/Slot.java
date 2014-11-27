@@ -7,6 +7,7 @@ import com.freedsuniverse.sidecraft.material.MaterialStack;
 
 public class Slot {
     private Item content;
+    
     private Rectangle box;
 
     public Slot(MaterialStack stack, Rectangle box) {

@@ -24,10 +24,14 @@ import com.freedsuniverse.sidecraft.world.GameWorld;
 import com.freedsuniverse.sidecraft.world.Location;
 
 public class Sidecraft extends Canvas implements Runnable {
-    private static final long serialVersionUID = 1L;
-    private static Rectangle center;
-    private static final int SKY_COLOR = 220;
-
+    
+	private static final long serialVersionUID = 1L;
+	private static final int SKY_COLOR = 220;
+	
+	private static Rectangle center;
+    
+    private static Graphics graphics;
+    
     private Player player;
 
     private int frames;
@@ -66,7 +70,7 @@ public class Sidecraft extends Canvas implements Runnable {
         if (isRunning)
             return;
 
-        Engine.graphics = getGraphics();
+        graphics = getGraphics();
         Thread th = new Thread(this);
 
         this.requestFocus();
@@ -89,7 +93,6 @@ public class Sidecraft extends Canvas implements Runnable {
 
         player = new Player();
         player.spawn(name);
-        player.world = world.getName();
         Location.setPlayerLocation(player.getLocation());
         hasStarted = true;
 
@@ -229,7 +232,7 @@ public class Sidecraft extends Canvas implements Runnable {
 
     @Override
     public void paint(Graphics g) {
-        Engine.graphics = g;
+        Sidecraft.graphics = g;
 
         if (hasStarted) {
             player.getLocation().getWorld().draw();
@@ -291,6 +294,10 @@ public class Sidecraft extends Canvas implements Runnable {
 
     public static Rectangle getCenterBound() {
         return center;
+    }
+    
+    public static Graphics graphics() {
+    	return Sidecraft.graphics;
     }
 
     public static BufferedImage getImage(String file) {

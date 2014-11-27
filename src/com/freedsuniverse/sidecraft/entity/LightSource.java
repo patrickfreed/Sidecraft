@@ -16,7 +16,8 @@ import com.freedsuniverse.sidecraft.world.Location;
 
 public class LightSource extends Entity {
 
-    private int intensity, radius;
+    private int intensity;
+    private int radius;
 
     // TODO: add colored lighting
 

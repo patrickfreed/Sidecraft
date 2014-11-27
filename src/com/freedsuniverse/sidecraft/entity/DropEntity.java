@@ -13,8 +13,7 @@ import com.freedsuniverse.sidecraft.material.MaterialStack;
 import com.freedsuniverse.sidecraft.world.Location;
 
 public class DropEntity extends Entity {
-    final static double REACH_DISTANCE = 1.8;
-
+	
     private final Item type;
 
     public DropEntity(Item t) {

@@ -15,6 +15,7 @@ import com.freedsuniverse.sidecraft.material.Material;
 
 public class Block extends Entity {
     private Material data;
+   
     private int health;
 
     public Block(Material d) {

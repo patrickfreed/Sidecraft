@@ -7,8 +7,19 @@ import com.freedsuniverse.sidecraft.Settings;
 import com.freedsuniverse.sidecraft.world.Location;
 
 public class Mouse {
-    private static boolean m1 = false, oldm1 = false, currentm1 = false, m2 = false, oldm2 = false, currentm2 = false, m3 = false, oldm3 = false, currentm3 = false;
-    private static int x = 0, y = 0, w = 0;
+    private static boolean m1 = false;
+    private static boolean oldm1 = false;
+    private static boolean currentm1 = false;
+    private static boolean m2 = false;
+    private static boolean oldm2 = false;
+    private static boolean currentm2 = false;
+    private static boolean m3 = false;
+    private static boolean oldm3 = false;
+    private static boolean currentm3 = false;
+    
+    private static int x = 0;
+    private static int y = 0;
+    private static int w = 0;
 
     public static void modifyScrollWheelValue(int a) {
         Mouse.w += a;

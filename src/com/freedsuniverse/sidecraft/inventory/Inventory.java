@@ -8,8 +8,8 @@ import com.freedsuniverse.sidecraft.material.tools.Quality;
 public class Inventory {
     private Item[][] contents;
 
-    public final static int ROWS = 4;
-    public final static int COLUMNS = 5;
+    private final static int ROWS = 4;
+    private final static int COLUMNS = 5;
 
     public Inventory() {
         contents = new Item[ROWS][COLUMNS];

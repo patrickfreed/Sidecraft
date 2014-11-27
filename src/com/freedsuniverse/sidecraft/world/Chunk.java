@@ -5,11 +5,14 @@ import java.util.ArrayList;
 import com.freedsuniverse.sidecraft.entity.Entity;
 
 public class Chunk {
-    private Block[][] bData;
-    ArrayList<Entity> eData;
     public final static int SIZE = 32;
-
-    private final int xmod, ymod;
+    
+    private final int xmod;
+    private final int ymod;
+    
+    private Block[][] bData;
+    
+    private ArrayList<Entity> eData;
 
     public Chunk(String xy) {
         this(Integer.valueOf(xy.charAt(0)), Integer.valueOf(xy.charAt(2)));

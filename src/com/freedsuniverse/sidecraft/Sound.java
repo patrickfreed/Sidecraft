@@ -7,9 +7,9 @@ import org.newdawn.easyogg.OggClip;
 /*currently this class is just a wrapper until I find something useful to do with it*/
 
 public class Sound {
-    public static Sound blockDamage = new Sound("/audio/material/sedimentWalk.ogg");
-    public static Sound sedimentWalk = new Sound("/audio/material/sedimentWalk.ogg");
-    public static Sound rockWalk = new Sound("/audio/material/sedimentWalk.ogg");
+    public static final Sound blockDamage = new Sound("/audio/material/sedimentWalk.ogg");
+    public static final Sound sedimentWalk = new Sound("/audio/material/sedimentWalk.ogg");
+    public static final Sound rockWalk = new Sound("/audio/material/sedimentWalk.ogg");
 
     private OggClip clip;
 

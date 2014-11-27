@@ -18,19 +18,25 @@ import com.freedsuniverse.sidecraft.world.CollisionListener;
 import com.freedsuniverse.sidecraft.world.Location;
 
 public class LivingEntity extends Entity {
-    private static final long DAMAGE_TIME = 500, RECENT_DAMAGE_TIME = 4000;
+    private static final long DAMAGE_TIME = 500;
+    private static final long RECENT_DAMAGE_TIME = 4000;
+    
     protected String id;
 
     public static final int STATIONARY = 0, WALKING = 1;
 
     private Animation[] anime;
-    private int health, recentdmg;
-    private Inventory inv;
-    private boolean damaged = false;
-    private long dmg = -1;
-
-    public int footContacts;
+    
+    private int health;
+    private int recentdmg;
     private int currentAnimation;
+    protected int footContacts;
+    
+    private long dmg;
+    
+    private Inventory inv;
+    
+    private boolean damaged;
     private boolean facingLeft;
 
     public LivingEntity(String id, int w, int h, int health, float density) {
@@ -56,6 +62,8 @@ public class LivingEntity extends Entity {
         this.id = id;
         setHealth(health);
         facingLeft = false;
+        damaged = false;
+        dmg = -1;
     }
 
     public void draw() {
@@ -151,9 +159,19 @@ public class LivingEntity extends Entity {
 
         destroyed = true;
     }
-
+  
     public int getHealth() {
         return health;
+    }
+    
+    public int getFootContacts() {
+    	return footContacts;
+    }
+    
+    public void setFootContacts(int n) {
+    	if (n >= 0 && n <= 100) {
+    		footContacts = n;
+    	}
     }
 
     public Inventory getInventory() {

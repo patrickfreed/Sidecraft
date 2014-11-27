@@ -7,8 +7,13 @@ import java.awt.image.BufferedImage;
 import com.freedsuniverse.sidecraft.Sidecraft;
 
 public class Animation {
-    private BufferedImage[] imgs;
-    private int frequency, currentTick, currentIndex, length;
+    
+	private BufferedImage[] imgs;
+    
+    private int frequency;
+    private int currentTick;
+    private int currentIndex;
+    private int length;
 
     public static BufferedImage flip(BufferedImage i) {
         AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);

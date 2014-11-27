@@ -18,10 +18,12 @@ import com.freedsuniverse.sidecraft.Main;
 import com.freedsuniverse.sidecraft.Settings;
 
 public class EditSave extends Screen {
-
     private static final long serialVersionUID = -2030994089783662492L;
+    
     private File save;
+    
     private JTextField input;
+    
     private JLabel sl;
 
     public EditSave(JLabel selected) {

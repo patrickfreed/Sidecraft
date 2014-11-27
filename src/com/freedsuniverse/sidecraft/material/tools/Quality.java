@@ -3,7 +3,9 @@ package com.freedsuniverse.sidecraft.material.tools;
 import java.awt.Color;
 
 public enum Quality {
-    STONE(4, Color.DARK_GRAY), IRON(2, Color.GRAY), SILVER(1, Color.LIGHT_GRAY);
+    STONE(4, Color.DARK_GRAY), 
+    IRON(2, Color.GRAY), 
+    SILVER(1, Color.LIGHT_GRAY);
 
     private int d;
     private Color c;

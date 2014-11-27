@@ -1,10 +1,11 @@
 package com.freedsuniverse.sidecraft.input;
 
 public class Key {
-    public static Key W = new Key(), A = new Key(), S = new Key(), D = new Key(), B = new Key(), I = new Key(), F5 = new Key(), SPACE = new Key(), ESCAPE = new Key(), ONE = new Key(), TWO = new Key(), THREE = new Key(), FOUR = new Key(), FIVE = new Key(), F = new Key(),
-            M = new Key();
+    public static Key W = new Key(), A = new Key(), S = new Key(), D = new Key(), B = new Key(), I = new Key(), F5 = new Key(), SPACE = new Key(), ESCAPE = new Key(), ONE = new Key(), TWO = new Key(), THREE = new Key(), FOUR = new Key(), FIVE = new Key(), F = new Key(), M = new Key();
 
-    boolean down, old, current;
+    private boolean down;
+    private boolean old;
+    private boolean current;
 
     public static void releaseAll() {
         W.toggle(false);

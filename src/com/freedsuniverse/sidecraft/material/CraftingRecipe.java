@@ -3,10 +3,12 @@ package com.freedsuniverse.sidecraft.material;
 import java.util.LinkedList;
 
 public class CraftingRecipe {
-    public static LinkedList<CraftingRecipe> recipes = new LinkedList<CraftingRecipe>();
+    public static final LinkedList<CraftingRecipe> recipes = new LinkedList<CraftingRecipe>();
 
     private int[] recipe;
+    
     private Material outcome;
+    
     private int amount;
 
     public static MaterialStack getMatch(int[] toCompare) {

@@ -30,7 +30,6 @@ import com.freedsuniverse.sidecraft.world.gen.FlatNoiseGen;
 import com.freedsuniverse.sidecraft.world.gen.WorldGen;
 
 public class GameWorld extends World {
-    
     private final static int LIGHTMAP_DIMENSION = 32 * 60;
     private final static int UPDATE_RANGE = 32;
     private final static long DAY_LENGTH = 48000;

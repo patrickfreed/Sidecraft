@@ -12,19 +12,18 @@ import java.util.LinkedList;
 
 import org.jbox2d.dynamics.Body;
 
+import com.freedsuniverse.sidecraft.Sidecraft;
 import com.freedsuniverse.sidecraft.entity.Entity;
 import com.freedsuniverse.sidecraft.world.Location;
 
 public class Engine {
-    public static Graphics graphics;
-
     private static LinkedList<RenderQueueItem> queue = new LinkedList<RenderQueueItem>();
 
     public static void render(Entity e) {
         if (!e.isRegistered())
             return;
 
-        Graphics2D g2 = (Graphics2D) graphics;
+        Graphics2D g2 = (Graphics2D) getGraphics();
         Body b = e.getBody();
         int[] loc = e.getLocation().toArray();
         BufferedImage skin = e.getSkin();
@@ -40,8 +39,8 @@ public class Engine {
     }
 
     public static void renderRectangle(int x, int y, int width, int height, Color c) {
-        graphics.setColor(c);
-        graphics.fillRect(x, y, width, height);
+        getGraphics().setColor(c);
+        getGraphics().fillRect(x, y, width, height);
     }
 
     public static void render(Rectangle rec, BufferedImage img) {
@@ -49,28 +48,28 @@ public class Engine {
     }
 
     public static void render(int x, int y, int length, int width, BufferedImage img) {
-        graphics.drawImage(scaleImage(img, width, length), x, y, null);
+        getGraphics().drawImage(scaleImage(img, width, length), x, y, null);
     }
 
     public static void render(Location loc, int width, int height, BufferedImage img) {
         int[] pix = loc.toArray();
         BufferedImage img1 = scale(img, width, height);
-        graphics.drawImage(img1, pix[0] - img1.getWidth() / 2, pix[1] - img1.getHeight() / 2, null);
+        getGraphics().drawImage(img1, pix[0] - img1.getWidth() / 2, pix[1] - img1.getHeight() / 2, null);
     }
 
     public static void render(Location loc, BufferedImage img) {
         int[] pix = loc.toArray();
 
-        graphics.drawImage(img, pix[0] - img.getWidth() / 2, pix[1] - img.getHeight() / 2, null);
+        getGraphics().drawImage(img, pix[0] - img.getWidth() / 2, pix[1] - img.getHeight() / 2, null);
     }
 
     public static void render(int x, int y, BufferedImage img) {
-        graphics.drawImage(img, x, y, null);
+        getGraphics().drawImage(img, x, y, null);
     }
 
     public static void renderString(String str, int x, int y, Color c) {
-        graphics.setColor(c);
-        graphics.drawString(str, x, y);
+        getGraphics().setColor(c);
+        getGraphics().drawString(str, x, y);
     }
 
     public static void renderString(String str, Location loc, Color c) {
@@ -108,5 +107,9 @@ public class Engine {
 
     public static void render(RenderQueueItem i) {
         i.draw();
+    }
+    
+    public static Graphics getGraphics() {
+    	return Sidecraft.graphics();
     }
 }

@@ -7,11 +7,32 @@ import com.freedsuniverse.sidecraft.Main;
 import com.freedsuniverse.sidecraft.Sound;
 
 public enum Material {
-    AIR(0, 0, 0, 0, 0, false), GRASS(2), DIRT(2), STONE(3, 40), IRON_ORE(4, 45), OBSIDIAN(5, 100), SAND(6, 10), COAL_ORE(7, 40), SILVER_ORE(8, 60), GOLD_ORE(9, 45), WATER(0, 0, 0, 0, 0, false), TNT(0, 1), WORKBENCH(12), PICKAXE(13), TORCH(14, 1, false);
+    AIR(0, 0, 0, 0, 0, false), 
+    GRASS(2), 
+    DIRT(2), 
+    STONE(3, 40), 
+    IRON_ORE(4, 45), 
+    OBSIDIAN(5, 100), 
+    SAND(6, 10), 
+    COAL_ORE(7, 40), 
+    SILVER_ORE(8, 60), 
+    GOLD_ORE(9, 45), 
+    WATER(0, 0, 0, 0, 0, false), 
+    TNT(0, 1), 
+    WORKBENCH(12), 
+    PICKAXE(13), 
+    TORCH(14, 1, false);
 
-    public static final int LIQUID = 0, SEDIMENT = 1, ROCK = 2;
+    public static final int LIQUID = 0;
+    public static final int SEDIMENT = 1;
+    public static final int ROCK = 2;
 
-    private int id, stack, damage, durability, dropamount, dropType;
+    private int id;
+    private int stack;
+    private int damage;
+    private int durability;
+    private int dropamount;
+    private int dropType;
 
     private boolean solidity;
 

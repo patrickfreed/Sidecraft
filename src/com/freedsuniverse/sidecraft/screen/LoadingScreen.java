@@ -11,7 +11,6 @@ import javax.swing.SwingConstants;
 import com.freedsuniverse.sidecraft.Main;
 
 public class LoadingScreen extends Screen {
-
 	private static final long serialVersionUID = 1L;
 	private static final int HALF_HEIGHT = 20;
 	

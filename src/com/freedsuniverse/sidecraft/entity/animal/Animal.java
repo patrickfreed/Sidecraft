@@ -5,16 +5,15 @@ import java.util.Random;
 import com.freedsuniverse.sidecraft.entity.LivingEntity;
 
 public class Animal extends LivingEntity {
-    private final long DECISION_TIME = 4000;
-
-    private final float WALKING_SPEED;
+    
+	private static final long DECISION_TIME = 4000;
+    private static final float WALKING_SPEED = 3.0f;
+    
     private float speed;
-
     private long lastDecision = 0;
 
     public Animal(String id, int w, int h, int hp, float mass) {
         super(id, w, h, hp, mass);
-        WALKING_SPEED = 3.0f;
     }
 
     public void update() {

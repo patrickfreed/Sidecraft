@@ -172,9 +172,8 @@ public class Entity {
     }
 
     public void setBody(Body body) {
-        if (body == null)
-            return;
-
-        b = body;
+        if (body != null) {
+        	b = body;
+        }
     }
 }

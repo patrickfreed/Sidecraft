@@ -24,33 +24,32 @@ import com.freedsuniverse.sidecraft.world.active.Torch;
 import com.freedsuniverse.sidecraft.world.active.Workbench;
 
 public class Player extends LivingEntity {
-    private float WALKING_SPEED = 3.0f;
+    private final static int ATTACK_DAMAGE = 1;	
+	private final static float WALKING_SPEED = 3.0f;
+    private final static long ATTACK_SPEED = 500;
+    
     private Toolbar toolbar;
+    
     private EntityInventory inventory;
 
-    private ActionState action, oldAction;
+    private ActionState action;
+    private ActionState oldAction;
 
     private Rectangle rec;
 
-    // private Animation[] animations;
-
-    final double JUMP_HEIGHT = 1.3;
-    final int ATTACK_DAMAGE = 1;
-    final int IDLE = 0, BUSY = 1;
-
     private long lastAttack;
 
-    private boolean isAttacking = false, canDamage = true;
+    private boolean isAttacking = false;
+    private boolean canDamage = true;
 
-    private int oldWheelValue, currentWheelValue;
+    private int oldWheelValue;
+    private int currentWheelValue;
 
-    public String world;
-
-    enum MovementState {
+    public enum MovementState {
         WALKING, JUMPING, FALLING
     }
 
-    enum ActionState {
+    public enum ActionState {
         IDLE, BUSY
     }
 
@@ -109,7 +108,7 @@ public class Player extends LivingEntity {
         oldWheelValue = currentWheelValue;
         currentWheelValue = Mouse.getScrollWheelValue();
 
-        this.getLocation().setCoordinates(b.getPosition().x, b.getPosition().y);
+        getLocation().setCoordinates(b.getPosition().x, b.getPosition().y);
         updateInteraction();
         updateToolbar();
         updateMovement();
@@ -120,7 +119,7 @@ public class Player extends LivingEntity {
     }
 
     private long getAttackSpeed() {
-        return 500;
+        return ATTACK_SPEED; // Attacks per second
     }
 
     private void updateMovement() {
@@ -182,7 +181,7 @@ public class Player extends LivingEntity {
     private void updateInteraction() {
         if (action != ActionState.BUSY) {
             if (Key.I.toggled() && oldAction != ActionState.BUSY) {
-                setAction(BUSY);
+                setAction(ActionState.BUSY);
                 inventory.open();
             } else if (Mouse.isDown(MouseEvent.BUTTON1)) {
                 Location mouseCoords = Mouse.getLocation();
@@ -199,11 +198,9 @@ public class Player extends LivingEntity {
                     }
                     Block block = getLocation().getWorld().getBlockAt(mouseCoords);
 
-                    if (block.getType().getDurability() <= 0) {
-                        return;
+                    if (block.getType().getDurability() > 0) {
+                    	attack(getLocation().getWorld().getBlockAt(mouseCoords));
                     }
-
-                    attack(getLocation().getWorld().getBlockAt(mouseCoords));
                 }
             } else if (Mouse.clicked(MouseEvent.BUTTON3)) {
                 Location mouseCoords = Mouse.getLocation();
@@ -228,7 +225,7 @@ public class Player extends LivingEntity {
             }
         } else {
             if (Key.I.toggled()) {
-                setAction(IDLE);
+                setAction(ActionState.IDLE);
                 getInventory().close();
             } else {
                 getInventory().update();
@@ -236,14 +233,9 @@ public class Player extends LivingEntity {
         }
     }
 
-    public void setAction(int i) {
+    public void setAction(ActionState a) {
         oldAction = action;
-
-        if (i == IDLE) {
-            action = ActionState.IDLE;
-        } else if (i == BUSY) {
-            action = ActionState.BUSY;
-        }
+        action = a;
     }
 
     @Override
@@ -324,7 +316,7 @@ public class Player extends LivingEntity {
             lastAttack = System.currentTimeMillis();
             canDamage = false;
         } else if (e instanceof LivingEntity) {
-            ((LivingEntity) e).damage(2);
+            ((LivingEntity) e).damage(ATTACK_DAMAGE);
             isAttacking = true;
             lastAttack = System.currentTimeMillis();
             canDamage = false;

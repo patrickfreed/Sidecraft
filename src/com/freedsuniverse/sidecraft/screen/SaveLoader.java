@@ -23,9 +23,10 @@ import com.freedsuniverse.sidecraft.Sidecraft;
 
 public class SaveLoader extends Screen {
     private static final long serialVersionUID = 1L;
-
-    private JLabel info, selected;
-    private final int SAVES = 5;
+    private static final int SAVES = 5;
+    
+    private JLabel info;
+    private JLabel selected;
 
     private JPanel back;
 

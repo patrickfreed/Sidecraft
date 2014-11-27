@@ -7,7 +7,8 @@ import com.freedsuniverse.sidecraft.engine.Engine;
 import com.freedsuniverse.sidecraft.engine.RenderQueueItem;
 
 public class MaterialStack extends Item {
-    public final static int DEFAULT_STACK_SIZE = 64, Y_OFFSET = 30, X_OFFSET = 20;
+    private final static int Y_OFFSET = 30;
+    private final static int X_OFFSET = 20;
 
     public MaterialStack(Material t, int am) {
         super(t, am);

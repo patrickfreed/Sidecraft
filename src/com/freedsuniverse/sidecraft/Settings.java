@@ -5,7 +5,8 @@ import java.awt.GraphicsEnvironment;
 import java.io.File;
 
 public class Settings {
-    // Modify-able settings
+    
+	// Modify-able settings
     public static int BLOCK_SIZE = 32;
     public static boolean DEBUG = false;
     public static boolean SOUND = true;
