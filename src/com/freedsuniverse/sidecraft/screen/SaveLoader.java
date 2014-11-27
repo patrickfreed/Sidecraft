@@ -32,7 +32,7 @@ public class SaveLoader extends Screen {
     public SaveLoader() {
         SpringLayout springLayout = new SpringLayout();
         this.setLayout(springLayout);
-
+        
         // TODO: Fix
         @SuppressWarnings("unused")
         File[] dirs = new File(Settings.defaultDirectory()).listFiles();
@@ -115,10 +115,20 @@ public class SaveLoader extends Screen {
                 // selected.getText()).exists()) {
                 // Main.loadGame(selected.getText());
                 // }else {
-                Main.getGame().startNewGame(selected.getText());
-                // }
-
-                Main.setScreen(Sidecraft.class.getName());
+            	
+            	LoadingScreen l = new LoadingScreen(new Runnable() {
+            		public void run() {
+            			Main.getGame().startNewGame(selected.getText());
+            			try {
+							Thread.sleep(2000);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+            			Main.setScreen(Sidecraft.class.getName());
+            		}
+            	}, "Generating world...");
+            	           	
+            	l.focus();           	
             }
         });
         springLayout.putConstraint(SpringLayout.NORTH, btnLoad, 10, SpringLayout.SOUTH, back);

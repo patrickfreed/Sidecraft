@@ -149,6 +149,7 @@ public class Sidecraft extends Canvas implements Runnable {
 
                 if (Settings.DEBUG) {
                     System.out.println(ticks + " ticks, " + frames + " fps");
+                    lastFps = frames;
                 }
 
                 frames = 0;
