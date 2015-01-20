@@ -26,7 +26,7 @@ import com.freedsuniverse.sidecraft.entity.Player;
 import com.freedsuniverse.sidecraft.entity.debug.DebugEntity;
 import com.freedsuniverse.sidecraft.input.Key;
 import com.freedsuniverse.sidecraft.material.Material;
-import com.freedsuniverse.sidecraft.world.gen.FlatNoiseGen;
+import com.freedsuniverse.sidecraft.world.gen.FlatWorldGen;
 import com.freedsuniverse.sidecraft.world.gen.WorldGen;
 
 public class GameWorld extends World {
@@ -73,7 +73,7 @@ public class GameWorld extends World {
     }
 
     public GameWorld(String n) {
-        this(n, new HashMap<String, Block>(), new HashMap<String, ArrayList<Entity>>(), new FlatNoiseGen());
+        this(n, new HashMap<String, Block>(), new HashMap<String, ArrayList<Entity>>(), new FlatWorldGen());
     }
 
     public GameWorld(String n, HashMap<String, Block> blocks, HashMap<String, ArrayList<Entity>> es, WorldGen g) {
@@ -99,12 +99,12 @@ public class GameWorld extends World {
         System.out.println("Day " + day + " dawns.");
     }
 
-    public void update() {       
+    public void update() {
         if (p == null) {
             System.err.println("World  '" + this.getName() + "' is being updated without a player.");
             return;
         }
-        
+
         Location l = p.getLocation();
 
         long time = System.currentTimeMillis() - lastMorning;
@@ -150,8 +150,7 @@ public class GameWorld extends World {
                 lightUpdate();
             }
         }
-        
-        generateWorld((int) l.getX(), (int) l.getY());
+
         step(1.0f / Settings.REFRESH_RATE, 3, 3);
         updateBlocks();
         updateEntities();
@@ -184,7 +183,7 @@ public class GameWorld extends World {
             registerEntity(e);
         }
 
-        // no longer necessary for blocks, will be necessary for entities later. 
+        // no longer necessary for blocks, will be necessary for entities later.
         // preRegister is going to need some major tweaking
         for (Entity e : toCreate) {
             Body body = this.createBody(e.getBd());
@@ -496,10 +495,10 @@ public class GameWorld extends World {
         Location l = p.getLocation().modify(-r / 2, r / 4);
         l.setX(Math.floor(l.getX()));
         l.setY(Math.ceil(l.getY()));
-        
+
         HashMap<Material, Image> scaled = new HashMap<Material, Image>();
         Material[] ms = Material.values();
-        
+
         for (Material m : ms) {
             scaled.put(m, Engine.scaleImage(m.getImage(), size, size));
         }

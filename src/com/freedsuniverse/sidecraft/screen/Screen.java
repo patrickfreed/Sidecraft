@@ -1,6 +1,8 @@
 package com.freedsuniverse.sidecraft.screen;
 
 import java.awt.Graphics;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.image.BufferedImage;
 
 import javax.swing.JPanel;
@@ -14,6 +16,27 @@ public class Screen extends JPanel {
     private BufferedImage img = Main.getImage(Settings.MENU_BACKGROUND_TILE);
     private String prev;
 
+    public Screen() {   
+        this.addComponentListener( new ComponentListener() {
+            @Override
+            public void componentShown( ComponentEvent e ) {
+                Screen.this.requestFocusInWindow();
+            }
+
+            @Override
+            public void componentResized(ComponentEvent e) {    
+            }
+
+            @Override
+            public void componentMoved(ComponentEvent e) {   
+            }
+
+            @Override
+            public void componentHidden(ComponentEvent e) {
+            }
+        });
+    }
+    
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);

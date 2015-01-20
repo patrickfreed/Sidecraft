@@ -1,32 +1,33 @@
 package com.freedsuniverse.sidecraft;
 
-import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.imageio.ImageIO;
+import javax.swing.Timer;
 
 import com.freedsuniverse.sidecraft.engine.Engine;
 import com.freedsuniverse.sidecraft.entity.Player;
-import com.freedsuniverse.sidecraft.input.InputListener;
 import com.freedsuniverse.sidecraft.input.Key;
 import com.freedsuniverse.sidecraft.input.Mouse;
 import com.freedsuniverse.sidecraft.material.CraftingRecipe;
 import com.freedsuniverse.sidecraft.material.Material;
 import com.freedsuniverse.sidecraft.screen.Paused;
+import com.freedsuniverse.sidecraft.screen.Screen;
 import com.freedsuniverse.sidecraft.world.GameWorld;
 import com.freedsuniverse.sidecraft.world.Location;
 
-public class Sidecraft extends Canvas implements Runnable {
+public class Sidecraft extends Screen {
 
     private static final long serialVersionUID = 1L;
-    private static final int SKY_COLOR = 220;
 
     private static Rectangle center;
 
@@ -35,14 +36,17 @@ public class Sidecraft extends Canvas implements Runnable {
     private Player player;
 
     private int frames;
+    private int ticks;
     private int lastFps;
 
-    private long now;
     private long lastTime;
+    private long lastTime1;
 
     private boolean isRunning;
     private boolean isPaused;
     private boolean hasStarted;
+
+    private double unprocessed;
 
     private HashMap<String, GameWorld> worlds;
 
@@ -57,21 +61,14 @@ public class Sidecraft extends Canvas implements Runnable {
         worlds = new HashMap<String, GameWorld>();
 
         setBackground(Color.DARK_GRAY);
-
-        InputListener i = InputListener.i;
-        this.addKeyListener(i);
-        this.addMouseListener(i);
-        this.addMouseMotionListener(i);
-        this.addMouseWheelListener(i);
-        this.requestFocus();
     }
 
     public void start() {
-        if (isRunning)
+        if (isRunning) {
             return;
+        }
 
         graphics = getGraphics();
-        Thread th = new Thread(this);
 
         this.requestFocus();
         this.isRunning = true;
@@ -79,7 +76,18 @@ public class Sidecraft extends Canvas implements Runnable {
 
         CraftingRecipe.recipes.add(new CraftingRecipe(new int[] { 2, 2, -1, -1, -1, -1, -1, -1, -1 }, Material.IRON_ORE, 16));
 
-        th.start();
+        lastTime = System.nanoTime();
+        lastTime1 = System.currentTimeMillis();
+        
+        Timer t = new Timer(2, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                tick();
+            }
+        });
+        
+        this.requestFocus();
+        t.start();
     }
 
     public void startNewGame(String name) {
@@ -112,59 +120,45 @@ public class Sidecraft extends Canvas implements Runnable {
         hasStarted = true;
     }
 
-    public void run() {
-        long lastTime = System.nanoTime();
-        long lastTimer1 = System.currentTimeMillis();
-
-        double unprocessed = 0;
+    public void tick() {
         double nsPerTick = 1000000000.0 / Settings.REFRESH_RATE;
+        long now = System.nanoTime();
+        unprocessed += (now - lastTime) / nsPerTick;
+        lastTime = now;
 
-        int frames = 0;
-        int ticks = 0;
+        boolean shouldRender = false;
 
-        while (isRunning) {
-            long now = System.nanoTime();
-            unprocessed += (now - lastTime) / nsPerTick;
-            lastTime = now;
-
-            boolean shouldRender = false;
-
-            while (unprocessed >= 1) {
-                ticks++;
-                update();
-                unprocessed -= 1;
-                shouldRender = true;
-            }
-
-            try {
-                Thread.sleep(2);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            if (shouldRender) {
-                frames++;
-                repaint();
-            }
-
-            if (System.currentTimeMillis() - lastTimer1 > 1000) {
-                lastTimer1 += 1000;
-
-                if (Settings.DEBUG) {
-                    System.out.println(ticks + " ticks, " + frames + " fps");
-                    lastFps = frames;
-                }
-
-                frames = 0;
-                ticks = 0;
-            }
+        while (unprocessed >= 1) {
+            ticks++;
+            update();
+            unprocessed -= 1;
+            shouldRender = true;
         }
+
+        if (shouldRender) {
+            frames++;
+            repaint();
+        }
+
+        if (System.currentTimeMillis() - lastTime1 > 1000) {
+            lastTime1 = System.currentTimeMillis();
+
+            if (Settings.DEBUG) {
+                System.out.println(ticks + " ticks, " + frames + " fps");
+                lastFps = frames;
+            }
+
+            frames = 0;
+            ticks = 0;
+        }
+        lastTime = now;
     }
 
     public void update() {
         if (Key.ESCAPE.toggled()) {
             pause();
         }
+        
         updateKeys();
         Mouse.update();
 
@@ -173,15 +167,6 @@ public class Sidecraft extends Canvas implements Runnable {
                 Settings.DEBUG = !Settings.DEBUG;
             }
             worlds.values().iterator().next().update();
-        }
-
-        now = System.currentTimeMillis();
-        frames++;
-
-        if (now - lastTime > 1000) {
-            lastFps = frames;
-            frames = 0;
-            lastTime = now;
         }
     }
 
@@ -205,40 +190,49 @@ public class Sidecraft extends Canvas implements Runnable {
         Key.ESCAPE.update();
     }
 
-    public void update(Graphics graphics) {
+    @Override
+    public void paint(Graphics g) {
         if (dbImage == null) {
             dbImage = createImage(this.getWidth(), this.getHeight());
             dbg = dbImage.getGraphics();
         }
 
-        dbg.setColor(getBackground());
-
-        double increment = Double.valueOf(SKY_COLOR) / this.getHeight();
-        double color = 0;
+        int topOfScreen = (int) ((player.getLocation().getY() + 10.0) * Settings.BLOCK_SIZE);
 
         for (int y = 0; y < this.getHeight(); y++) {
-            Color c = new Color((int) color, (int) color, 255);
-            dbg.setColor(c);
+            dbg.setColor(getSkyColor(topOfScreen - y));
             dbg.fillRect(0, y, this.getWidth(), 1);
-
-            if (color < SKY_COLOR) {
-                color += increment;
-            }
         }
 
-        paint(dbg);
-        graphics.drawImage(dbImage, 0, 0, this);
-    }
-
-    @Override
-    public void paint(Graphics g) {
-        Sidecraft.graphics = g;
+        Sidecraft.graphics = dbg;
 
         if (hasStarted) {
             player.getLocation().getWorld().draw();
             player.draw();
             Engine.drawQueue();
             drawMisc();
+        }
+
+        g.drawImage(dbImage, 0, 0, this);
+    }
+
+    private Color getSkyColor(int y) {
+        double bound = Settings.BLOCK_SIZE * 8;
+
+        if (y == 0) {
+            return Color.WHITE;
+        } else if (y > 0) {
+            if (y >= bound) {
+                return Color.BLUE;
+            } else {
+                return new Color(255 - (int) (y / bound * 255.0), 255 - (int) (y / bound * 255.0), 255);
+            }
+        } else {
+            if (y <= -bound) {
+                return Color.BLACK;
+            } else {
+                return new Color(255 + (int) (y / bound * 255.0), 255 + (int) (y / bound * 255.0), 255 + (int) (y / bound * 255.0));
+            }
         }
     }
 
@@ -307,4 +301,5 @@ public class Sidecraft extends Canvas implements Runnable {
             return null;
         }
     }
+
 }

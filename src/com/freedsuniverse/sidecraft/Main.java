@@ -50,7 +50,7 @@ public class Main extends Applet {
     public static BufferedImage selectionTile;
     public static BufferedImage inventoryTile;
     public static BufferedImage workbenchTile;
-
+    
     public static void main(String[] args) {
         frame = new JFrame();
 
@@ -63,7 +63,7 @@ public class Main extends Applet {
 
     public static void setScreen(String string) {
         ((CardLayout) contentPane.getLayout()).show(contentPane, string);
-        contentPane.getComponent(0).requestFocus();
+        contentPane.getComponentAt(5, 5).requestFocus();
     }
 
     public static int getPaneWidth() {
@@ -95,25 +95,32 @@ public class Main extends Applet {
         loadTextures();
 
         contentPane = new JPanel();
+        contentPane.setOpaque(true);
         contentPane.setBorder(new EmptyBorder(0, 0, 0, 0));
         contentPane.setLayout(new CardLayout());
         contentPane.setBounds(c.getBounds());
-
-        contentPane.add(new Menu(), Menu.class.getName());
-        contentPane.add(new SaveLoader(), SaveLoader.class.getName());
-        contentPane.add(new Paused(), Paused.class.getName());
-        contentPane.add(new SettingsMenu(), SettingsMenu.class.getName());
-
+        
+        Menu m = new Menu();
+        SaveLoader sl = new SaveLoader();
+        Paused p = new Paused();
+        SettingsMenu sm = new SettingsMenu();
         s = new Sidecraft(contentPane.getWidth(), contentPane.getHeight());
+        
+        contentPane.add(m, Menu.class.getName());   
+        contentPane.add(p, Paused.class.getName());
+        contentPane.add(sm, SettingsMenu.class.getName());
+        contentPane.add(sl, SaveLoader.class.getName());
         contentPane.add(s, Sidecraft.class.getName());
-
+        
+        s.addMouseMotionListener(InputListener.i);
+        s.addMouseWheelListener(InputListener.i);
+        
         for (Component t : contentPane.getComponents()) {
             t.addKeyListener(InputListener.i);
             t.addMouseListener(InputListener.i);
         }
 
         frame.setContentPane(contentPane);
-
         frame.setIconImage(Main.getImage("/misc/menu/icon.png"));
 
         frame.setTitle("Sidecraft " + Settings.VERSION);
@@ -317,7 +324,7 @@ public class Main extends Applet {
         Settings.BLOCK_SIZE = width / Settings.DISPLAYED_BLOCKS;
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setBounds(100, 100, width, height);
+        frame.setBounds(0, 0, width, height);
         frame.setResizable(false);
 
         loadTextures();

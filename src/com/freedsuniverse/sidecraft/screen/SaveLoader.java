@@ -8,7 +8,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.File;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -18,7 +17,6 @@ import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
 
 import com.freedsuniverse.sidecraft.Main;
-import com.freedsuniverse.sidecraft.Settings;
 import com.freedsuniverse.sidecraft.Sidecraft;
 
 public class SaveLoader extends Screen {
@@ -35,8 +33,7 @@ public class SaveLoader extends Screen {
         this.setLayout(springLayout);
         
         // TODO: Fix
-        @SuppressWarnings("unused")
-        File[] dirs = new File(Settings.defaultDirectory()).listFiles();
+        //File[] dirs = new File(Settings.defaultDirectory()).listFiles();
 
         // -----------------------------
         // Add the labels
@@ -51,9 +48,9 @@ public class SaveLoader extends Screen {
 
         JLabel lblFirstLabel = new JLabel("World 1");
         lblFirstLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        springLayout.putConstraint(SpringLayout.NORTH, lblFirstLabel, 90, SpringLayout.NORTH, Main.contentPane);
-        springLayout.putConstraint(SpringLayout.WEST, lblFirstLabel, 160, SpringLayout.WEST, Main.contentPane);
-        springLayout.putConstraint(SpringLayout.EAST, lblFirstLabel, -160, SpringLayout.EAST, Main.contentPane);
+        springLayout.putConstraint(SpringLayout.NORTH, lblFirstLabel, 90, SpringLayout.NORTH, this);
+        springLayout.putConstraint(SpringLayout.WEST, lblFirstLabel, 160, SpringLayout.WEST, this);
+        springLayout.putConstraint(SpringLayout.EAST, lblFirstLabel, -160, SpringLayout.EAST, this);
         lblFirstLabel.setPreferredSize(new Dimension(Integer.MAX_VALUE, Main.contentPane.getHeight() / 11));
 
         // if(dirs.length > 0) {
@@ -120,11 +117,11 @@ public class SaveLoader extends Screen {
             	LoadingScreen l = new LoadingScreen(new Runnable() {
             		public void run() {
             			Main.getGame().startNewGame(selected.getText());
-            			try {
-							Thread.sleep(2000);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
+//            			try {
+//							Thread.sleep(2000);
+//						} catch (InterruptedException e) {
+//							e.printStackTrace();
+//						}
             			Main.setScreen(Sidecraft.class.getName());
             		}
             	}, "Generating world...");
@@ -159,11 +156,11 @@ public class SaveLoader extends Screen {
         springLayout.putConstraint(SpringLayout.NORTH, btnBack, 10, SpringLayout.NORTH, this);
         springLayout.putConstraint(SpringLayout.WEST, btnBack, 10, SpringLayout.WEST, this);
 
+        add(back);
         add(btnEdit);
         add(btnLoad);
         add(btnBack);
         add(info);
-        add(back);
         setSelected(lblFirstLabel);
     }
 

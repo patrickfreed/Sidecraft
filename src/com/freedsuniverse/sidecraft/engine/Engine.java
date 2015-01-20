@@ -18,7 +18,7 @@ import com.freedsuniverse.sidecraft.world.Location;
 
 public class Engine {
     private static LinkedList<RenderQueueItem> queue = new LinkedList<RenderQueueItem>();
-
+    
     public static void render(Entity e) {
         if (!e.isRegistered())
             return;

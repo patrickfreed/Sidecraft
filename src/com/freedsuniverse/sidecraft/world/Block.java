@@ -1,12 +1,9 @@
 package com.freedsuniverse.sidecraft.world;
 
-import java.awt.Color;
-
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.FixtureDef;
 
-import com.freedsuniverse.sidecraft.Sound;
 import com.freedsuniverse.sidecraft.engine.Engine;
 import com.freedsuniverse.sidecraft.entity.DropEntity;
 import com.freedsuniverse.sidecraft.entity.Entity;
@@ -15,7 +12,7 @@ import com.freedsuniverse.sidecraft.material.Material;
 
 public class Block extends Entity {
     private Material data;
-   
+
     private int health;
 
     public Block(Material d) {
@@ -68,15 +65,11 @@ public class Block extends Entity {
     }
 
     public void draw() {
-        Engine.render(getLocation(), this.getSkin());
-
-        if (this.getType() == Material.SILVER_ORE) {
-            Engine.renderRectangle(this.getBounds(), Color.RED);
-        }
+        Engine.render(this.getLocation(), this.getSkin());
     }
 
     public void damage(int d) {
-        Sound.blockDamage.play();
+        // Sound.blockDamage.play();
         this.health -= d;
 
         if (health <= 0) {
@@ -99,7 +92,7 @@ public class Block extends Entity {
             return;
         }
 
-        getLocation().getWorld().lightUpdate();
+        // getLocation().getWorld().lightUpdate();
     }
 
     public String toString() {

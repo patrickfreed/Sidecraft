@@ -29,6 +29,7 @@ public class Sound {
         clip.stop();
     }
 
+    @Deprecated
     public void play() {
         if (clip.isPaused() || clip.stopped())
             clip.play();
