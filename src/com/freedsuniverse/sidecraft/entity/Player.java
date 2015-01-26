@@ -27,7 +27,7 @@ public class Player extends LivingEntity {
 
     private final static int ATTACK_DAMAGE = 1;
     private final static float WALKING_SPEED = 4.75f;
-    private final static long ATTACK_SPEED = 500;
+    private final static long ATTACK_COOLDOWN = 100;
 
     private Toolbar toolbar;
 
@@ -120,7 +120,7 @@ public class Player extends LivingEntity {
     }
 
     private long getAttackSpeed() {
-        return ATTACK_SPEED; // Attacks per second
+        return ATTACK_COOLDOWN; // Time in ms between attacks
     }
 
     private void updateMovement() {

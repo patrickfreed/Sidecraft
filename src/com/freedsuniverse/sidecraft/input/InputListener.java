@@ -38,40 +38,57 @@ public class InputListener implements KeyListener, MouseListener, MouseMotionLis
         toggleKeys(e, true);
     }
 
-    // TODO: lol@else if chains
     private void toggleKeys(KeyEvent e, boolean toggleType) {
-        if (e.getKeyCode() == KeyEvent.VK_A)
+        switch (e.getKeyCode()) {
+        case KeyEvent.VK_A:
             Key.A.toggle(toggleType);
-        else if (e.getKeyCode() == KeyEvent.VK_W)
+            break;
+        case KeyEvent.VK_W:
             Key.W.toggle(toggleType);
-        else if (e.getKeyCode() == KeyEvent.VK_S)
+            break;
+        case KeyEvent.VK_S:
             Key.S.toggle(toggleType);
-        else if (e.getKeyCode() == KeyEvent.VK_D)
+            break;
+        case KeyEvent.VK_D:
             Key.D.toggle(toggleType);
-        else if (e.getKeyCode() == KeyEvent.VK_B)
+            break;
+        case KeyEvent.VK_B:
             Key.B.toggle(toggleType);
-        else if (e.getKeyCode() == KeyEvent.VK_F5)
+            break;
+        case KeyEvent.VK_F5:
             Key.F5.toggle(toggleType);
-        else if (e.getKeyCode() == KeyEvent.VK_I)
+            break;
+        case KeyEvent.VK_I:
             Key.I.toggle(toggleType);
-        else if (e.getKeyCode() == KeyEvent.VK_F)
+            break;
+        case KeyEvent.VK_F:
             Key.F.toggle(toggleType);
-        else if (e.getKeyCode() == KeyEvent.VK_M)
+            break;
+        case KeyEvent.VK_M:
             Key.M.toggle(toggleType);
-        else if (e.getKeyCode() == KeyEvent.VK_SPACE)
+            break;
+        case KeyEvent.VK_SPACE:
             Key.SPACE.toggle(toggleType);
-        else if (e.getKeyCode() == KeyEvent.VK_1)
+            break;
+        case KeyEvent.VK_1:
             Key.ONE.toggle(toggleType);
-        else if (e.getKeyCode() == KeyEvent.VK_2)
+            break;
+        case KeyEvent.VK_2:
             Key.TWO.toggle(toggleType);
-        else if (e.getKeyCode() == KeyEvent.VK_3)
+            break;
+        case KeyEvent.VK_3:
             Key.THREE.toggle(toggleType);
-        else if (e.getKeyCode() == KeyEvent.VK_4)
+            break;
+        case KeyEvent.VK_4:
             Key.FOUR.toggle(toggleType);
-        else if (e.getKeyCode() == KeyEvent.VK_5)
+            break;
+        case KeyEvent.VK_5:
             Key.FIVE.toggle(toggleType);
-        else if (e.getKeyCode() == KeyEvent.VK_ESCAPE)
+            break;
+        case KeyEvent.VK_ESCAPE:
             Key.ESCAPE.toggle(toggleType);
+            break;
+        }
     }
 
     @Override
